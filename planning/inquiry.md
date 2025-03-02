@@ -7,14 +7,11 @@
 * User has bad data organisation
 
 ## Inquiry Focus:
-* My inquiry focus will be around how can a digital technologies outcome be used to improve a user data organisation
-* I will conduct research into my inquiry focus and then propose a digital technologies outcome that is fitting for my inquiry
+* How can a digital technologies outcome help in solving user data organisation issues?
 
-## Questions:
-* ...
-
-## Question:
-* ...
+## Survey Questions:
+* Do you ever have trouble organising data?
+* What is the exact issue you have with organising data?
 
 ## Research:
 * ...
