@@ -1,5 +1,5 @@
 # Inquiry
----
+
 ## User/Stakeholkder/Audience:
 * Ms Walker
 
@@ -12,10 +12,9 @@
 ## Survey Questions:
 * Do you ever have trouble organising data?
 * What is the exact issue you have with organising data?
-* 
-
-## Research:
-* ...
+* Is this an issue that could be solved by a desktop/mobile application?
+* Why are you having this issue?
+* How could this issue be solved?
 
 ## Refined Question:
 * ...
