@@ -14,8 +14,7 @@
 | Direct Quote              | "Data organization refers to structuring project directories to aid the storage and finding of files, naming files to enable logical grouping and/or chronological sorting within directories, and structuring the contents of files to facilitate analysis." |
 | Is info reliable          | Yes, comes from Oregon Health & Science University website, very offical |
 | Info supports inquiry     | Yes, this info helps me with my inquiry, in that it shows me ways of organizing data, which I can then use for my outcome |
-| Changes after viewing     |        |
-| What has changed          |        |
+| Changes after viewing     | Now know some more methods for organising data |
 | PLUS                      |        |
 | MINUS                     |        |
 | Implications              |        |
@@ -34,8 +33,7 @@
 | Direct Quote              | "Johnny.Decimal is designed to help you find things quickly, with more confidence, and less stress." |
 | Is info reliable          | Website is reliable, method of organisation has mixed reviews for digital use, more suited to phyical world |
 | Info supports inquiry     | Yes, this info helps me with my inquiry, in that it gives me a method to organise data, which will be helpful in building my outcome |
-| Changes after viewing     |        |
-| What has changed          |        |
-| PLUS                      |        |
-| MINUS                     |        |
-| Implications              |        |
+| Changes after viewing     | I may use this method of data organisation for my digital outcome |
+| PLUS                      | Nice human-friendly system for organising data |
+| MINUS                     | More geared towards physical data like books than digital data |
+| Implications              | This article will influence the way I choose to implement my digital technologies outcome, through informing me about a human-friendly data organisation method. |

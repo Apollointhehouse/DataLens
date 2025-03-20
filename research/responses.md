@@ -1,5 +1,5 @@
 ## Survey:
-* Do you ever have trouble organising data? 66.7% yes, 33.3% no
+* Do you ever have trouble organising data? 57.1% yes, 42.9% no
 * what is the exact issue you have with organising data?
     - it's to hard for me to always sort my download files or even when doing a project sorting the data and differentiating it form other sets of data
     - its hard to find places to put data and find appropriate ways to display it

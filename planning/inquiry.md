@@ -17,4 +17,4 @@
 * How could this issue be solved?
 
 ## Refined Question:
-* ...
+* How could a desktop application outcome help in sorting user data?
