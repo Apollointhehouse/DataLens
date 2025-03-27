@@ -3,12 +3,12 @@
  */
 package application;
 
-public class App {
+public class DataLens {
     public String getGreeting() {
         return "Hello World!";
     }
 
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        System.out.println(new DataLens().getGreeting());
     }
 }

@@ -34,7 +34,24 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "application.App"
+    mainClass = "application.DataLens"
+}
+
+tasks.withType<Jar> {
+    // Sets main manifest attribute
+    manifest {
+        attributes["Main-Class"] = "application.DataLens"
+    }
+
+    archiveBaseName.set("DataLens")
+
+    // Includes dependencies in jar creating a "fat-jar"
+    val dependencies = configurations
+        .runtimeClasspath
+        .get()
+        .map { zipTree(it) }
+    from(dependencies)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 tasks.named<Test>("test") {
