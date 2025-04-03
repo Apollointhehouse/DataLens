@@ -1,15 +1,21 @@
 package me.apollointhehouse;
 
-import me.apollointhehouse.components.Window;
+import io.materialtheme.darkstackoverflow.DarkStackOverflowTheme;
+import mdlaf.MaterialLookAndFeel;
+import me.apollointhehouse.screen.HomeScreen;
+
+import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
         System.out.println("DataLens Initialised!");
 
-        var window = new Window.Builder()
-            .setTitle("DataLens")
-            .build();
+        try {
+            UIManager.setLookAndFeel(new MaterialLookAndFeel(new DarkStackOverflowTheme()));
+        } catch (UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
 
-        window.draw();
+        SwingUtilities.invokeLater(HomeScreen::new);
     }
 }
