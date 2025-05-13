@@ -1,26 +1,26 @@
 package me.apollointhehouse.screen;
 
-import me.apollointhehouse.data.NameLocator;
+import me.apollointhehouse.data.QueryLocator;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.concurrent.*;
 
 public class HomeScreen implements Screen {
     private final Window window;
 
     private final TextField search = new TextField("Enter Query!");
-    private final NameLocator locator = new NameLocator();
+    private final QueryLocator<@NotNull String, @NotNull Path> locator;
+    private final ExecutorService executor;
 
-    public HomeScreen() {
+    public HomeScreen(@NotNull ExecutorService executor, @NotNull QueryLocator<@NotNull String, @NotNull Path> locator) {
         window = new Window();
+        this.executor = executor;
+        this.locator = locator;
 
         init();
     }
@@ -39,40 +39,27 @@ public class HomeScreen implements Screen {
 
         window.add(panel, BorderLayout.CENTER);
 
-
         search.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-            }
+            private Future<?> future = CompletableFuture.allOf();
 
-            @Override
-            public void keyPressed(KeyEvent e) {
-
-            }
+            @Override public void keyTyped(KeyEvent e) {}
+            @Override public void keyPressed(KeyEvent e) {}
 
             @Override
             public void keyReleased(KeyEvent e) {
                 String query = search.getText();
-                var start = System.currentTimeMillis();
-                var paths = processWithTimeout(locator.locate(query), 10L, TimeUnit.SECONDS);
-                var elapsed = System.currentTimeMillis() - start;
 
-                System.out.println("Elapsed: " + elapsed);
-                System.out.println(paths.stream().map(Path::getFileName).toList().toString());
+                future.cancel(true);
+
+                var start = System.currentTimeMillis();
+                future = executor.submit(() -> {
+                    var paths = locator.locate(query).stream().map(Path::getFileName).toList();
+                    var elapsed = System.currentTimeMillis() - start;
+
+                    System.out.println("Elapsed: " + elapsed);
+                    System.out.println(paths);
+                });
             }
         });
     }
-
-    private static <T> List<T> processWithTimeout(Stream<T> stream, long timeout, TimeUnit unit) {
-        CompletableFuture<List<T>> future = CompletableFuture.supplyAsync(() -> stream.collect(Collectors.toList()));
-
-        try {
-            return future.get(timeout, unit);
-        } catch (Exception e) {
-            future.cancel(true); // Attempt to interrupt the stream processing
-            // Handle the timeout or interruption appropriately
-            return List.of(); // Return an empty list or throw a custom exception
-        }
-    }
-
 }

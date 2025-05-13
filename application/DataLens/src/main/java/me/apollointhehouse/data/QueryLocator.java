@@ -2,8 +2,8 @@ package me.apollointhehouse.data;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.stream.Stream;
+import java.util.Collection;
 
 public interface QueryLocator<T extends @NotNull Object, R extends @NotNull Object> {
-    Stream<R> locate(@NotNull T query);
+    Collection<R> locate(@NotNull T query);
 }
