@@ -1,6 +1,8 @@
 package me.apollointhehouse.data;
 
 import info.debatty.java.stringsimilarity.interfaces.StringDistance;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -10,26 +12,27 @@ import java.util.Comparator;
 import java.util.List;
 
 public class NameLocator implements QueryLocator<@NotNull String, @NotNull Path> {
+    private static final Logger logger = LogManager.getLogger(NameLocator.class);
+
+    private final Path start;
     private final StringDistance algo;
 
-    public NameLocator(StringDistance algo) {
+    public NameLocator(Path start, StringDistance algo) {
+        this.start = start;
         this.algo = algo;
     }
 
     @Override
     public List<Path> locate(@NotNull String query) {
-        System.out.println("Locating Query!");
+        logger.info("Locating Query!");
 
-        var path = Path.of("\\\\internal.rotorualakes.school.nz\\Users\\Home\\Students\\21076cameron\\Desktop\\.");
-
-        try (var files = Files.walk(path, 1)) {
+        try (var files = Files.walk(start, 1)) {
             return files
                 .filter(p -> {
                     try {
-//                        var attributes = Files.readAttributes(path, BasicFileAttributes.class);
-                        return !Files.isHidden(path);
+                        return !Files.isHidden(p);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        logger.error("File hidden check failed! ", e);
                     }
                     return false;
                 })
@@ -37,9 +40,9 @@ public class NameLocator implements QueryLocator<@NotNull String, @NotNull Path>
                 .limit(10)
                 .toList();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed! ", e);
         } catch (SecurityException e) {
-            System.out.println("Access Denied!");
+            logger.error("Access Denied!", e);
         }
 
         return List.of();

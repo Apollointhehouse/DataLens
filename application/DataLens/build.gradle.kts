@@ -10,10 +10,18 @@ repositories {
 }
 
 dependencies {
-    implementation("com.formdev:flatlaf:3.5.4")
-    implementation("org.jetbrains:annotations:24.0.0")
-    implementation("com.miglayout:miglayout-swing:11.2")
+    // Utils
     implementation("info.debatty:java-string-similarity:2.0.0")
+    implementation("org.jetbrains:annotations:24.0.0")
+
+    // UI
+    implementation("com.formdev:flatlaf:3.5.4")
+    implementation("com.miglayout:miglayout-swing:11.2")
+
+    // Logging
+    implementation("org.apache.logging.log4j:log4j-api:2.24.3")
+    implementation("org.apache.logging.log4j:log4j-core:2.24.3")
+    implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.3")
 
 //    testImplementation(platform("org.junit:junit-bom:5.10.0"))
 //    testImplementation("org.junit.jupiter:junit-jupiter")

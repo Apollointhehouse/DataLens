@@ -1,6 +1,8 @@
 package me.apollointhehouse.screen;
 
 import me.apollointhehouse.data.QueryLocator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -11,6 +13,8 @@ import java.nio.file.Path;
 import java.util.concurrent.*;
 
 public class HomeScreen implements Screen {
+    private static final Logger logger = LogManager.getLogger(HomeScreen.class);
+
     private final Window window;
 
     private final TextField search = new TextField("Enter Query!");
@@ -56,8 +60,8 @@ public class HomeScreen implements Screen {
                     var paths = locator.locate(query).stream().map(Path::getFileName).toList();
                     var elapsed = System.currentTimeMillis() - start;
 
-                    System.out.println("Elapsed: " + elapsed);
-                    System.out.println(paths);
+                    logger.info("Elapsed: {}", elapsed);
+                    logger.info(paths.toString());
                 });
             }
         });

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout>
+                <DisableAnsi>false</DisableAnsi>
+                <LevelPatternSelector defaultPattern="[%d{HH:mm:ss}] [%t/%C{1}:%L] %level: %msg{nolookups}%n">
+                    <PatternMatch key="INFO" pattern="%style{[%d{HH:mm:ss}] [%t/%C{1}:%L] %level:}{green} %msg{nolookups}%n"/>
+                    <PatternMatch key="WARN" pattern="%style{[%d{HH:mm:ss}] [%t/%C{1}:%L] %level:}{yellow} %msg{nolookups}%n"/>
+                    <PatternMatch key="ERROR" pattern="%style{[%d{HH:mm:ss}] [%t/%C{1}:%L] %level:}{red} %msg{nolookups}%n"/>
+                    <PatternMatch key="DEBUG" pattern="%style{[%d{HH:mm:ss}] [%t/%C{1}:%L] %level:}{magenta} %msg{nolookups}%n"/>
+                    <PatternMatch key="TRACE" pattern="%style{[%d{HH:mm:ss}] [%t/%C{1}:%L] %level:}{blue} %msg{nolookups}%n"/>
+                </LevelPatternSelector>
+            </PatternLayout>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>
