@@ -1,13 +1,13 @@
 package me.apollointhehouse;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
-import me.apollointhehouse.screen.HomeScreen;
-import javax.swing.*;
+import info.debatty.java.stringsimilarity.Jaccard;
 import me.apollointhehouse.data.NameLocator;
-import info.debatty.java.stringsimilarity.*;
+import me.apollointhehouse.screen.HomeScreen;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.swing.SwingUtilities;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,6 +23,7 @@ public class Main {
 
         FlatIntelliJLaf.setup();
 
+        // Uses dependency injection pattern in order to allow components of application to be easily swappable and testable
         SwingUtilities.invokeLater(() -> new HomeScreen(executor, new NameLocator(start, new Jaccard())));
     }
 }

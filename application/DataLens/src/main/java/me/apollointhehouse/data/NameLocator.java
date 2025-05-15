@@ -26,7 +26,7 @@ public class NameLocator implements QueryLocator<@NotNull String, @NotNull Path>
     public List<Path> locate(@NotNull String query) {
         logger.info("Locating Query!");
 
-        try (var files = Files.walk(start, 1)) {
+        try (var files = Files.walk(start, 2)) {
             return files
                 .filter(p -> {
                     try {
@@ -36,7 +36,7 @@ public class NameLocator implements QueryLocator<@NotNull String, @NotNull Path>
                     }
                     return false;
                 })
-                .sorted(Comparator.comparingDouble(p -> algo.distance(p.getFileName().toString(), query)))
+                .sorted(Comparator.comparingDouble(p -> algo.distance(p.getFileName().toString().toLowerCase(), query.toLowerCase())))
                 .limit(10)
                 .toList();
         } catch (IOException e) {
