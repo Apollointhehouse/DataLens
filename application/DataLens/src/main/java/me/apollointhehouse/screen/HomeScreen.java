@@ -68,7 +68,7 @@ public class HomeScreen implements Screen {
 
                 var start = System.currentTimeMillis();
                 future = executor.submit(() -> {
-                    var results = new SearchResults(locator.locate(query).stream().map(Path::getFileName).toList());
+                    var results = new SearchResults(locator.locate(query).stream().toList());
                     result.setModel(results);
                     var elapsed = System.currentTimeMillis() - start;
 

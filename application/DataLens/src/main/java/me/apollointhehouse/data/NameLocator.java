@@ -1,6 +1,8 @@
 package me.apollointhehouse.data;
 
 import info.debatty.java.stringsimilarity.interfaces.StringDistance;
+import mslinks.ShellLink;
+import mslinks.ShellLinkException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +38,22 @@ public class NameLocator implements QueryLocator<@NotNull String, @NotNull Path>
                     }
                     return false;
                 })
-                .sorted(Comparator.comparingDouble(p -> algo.distance(p.getFileName().toString().toLowerCase(), query.toLowerCase())))
+                .sorted(Comparator.comparingDouble(p -> {
+                    var name = p.getFileName().toString();
+//                    var type = name.substring(name.lastIndexOf('.'), name.length() - 1);
+
+//                    var shortcutTypes = List.of(".ink");
+//
+//                    if (shortcutTypes.contains(type)) {
+//                        try {
+//                            name = new ShellLink(p.toFile()).getName();
+//                        } catch (IOException | ShellLinkException e) {
+//                            logger.error(e);
+//                        }
+//                    }
+
+                    return algo.distance(name.toLowerCase(), query.toLowerCase());
+                }))
                 .limit(10)
                 .toList();
         } catch (IOException e) {

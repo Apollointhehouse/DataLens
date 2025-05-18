@@ -25,5 +25,9 @@ public class Main {
 
         // Uses dependency injection pattern in order to allow components of application to be easily swappable and testable
         SwingUtilities.invokeLater(() -> new HomeScreen(executor, new NameLocator(start, new Jaccard())));
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            logger.info("Shutting Down!");
+        }));
     }
 }
