@@ -16,7 +16,7 @@ public class Main {
     private static final Logger logger = LogManager.getLogger(Main.class);
 
     private static final ExecutorService executor = Executors.newCachedThreadPool();
-    private static final Path start = Path.of("\\\\internal.rotorualakes.school.nz\\Users\\Home\\Students\\21076cameron\\Desktop\\.");
+    private static final Path start = Path.of("\\\\internal.rotorualakes.school.nz\\Users\\Home\\Students\\21076cameron\\.");
 
     public static void main(String[] args) {
         logger.info("DataLens Initialised!");

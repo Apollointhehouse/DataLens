@@ -1,8 +1,6 @@
 package me.apollointhehouse.data;
 
 import info.debatty.java.stringsimilarity.interfaces.StringDistance;
-import mslinks.ShellLink;
-import mslinks.ShellLinkException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -28,33 +26,29 @@ public class NameLocator implements QueryLocator<@NotNull String, @NotNull Path>
     public List<Path> locate(@NotNull String query) {
         logger.info("Locating Query!");
 
-        try (var files = Files.walk(start, 2)) {
+        try (var files = Files.walk(start, 4)) {
             return files
                 .filter(p -> {
+                    String name = p.getFileName().toString();
+                    // Exclude Recycle Bin system files
+                    if (name.startsWith("$I") || name.startsWith("$R")) {
+                        return false;
+                    }
+
                     try {
                         return !Files.isHidden(p);
                     } catch (IOException e) {
                         logger.error("File hidden check failed! ", e);
                     }
+
                     return false;
                 })
                 .sorted(Comparator.comparingDouble(p -> {
                     var name = p.getFileName().toString();
-//                    var type = name.substring(name.lastIndexOf('.'), name.length() - 1);
-
-//                    var shortcutTypes = List.of(".ink");
-//
-//                    if (shortcutTypes.contains(type)) {
-//                        try {
-//                            name = new ShellLink(p.toFile()).getName();
-//                        } catch (IOException | ShellLinkException e) {
-//                            logger.error(e);
-//                        }
-//                    }
 
                     return algo.distance(name.toLowerCase(), query.toLowerCase());
                 }))
-                .limit(10)
+                .limit(15)
                 .toList();
         } catch (IOException e) {
             logger.error("Failed! ", e);
