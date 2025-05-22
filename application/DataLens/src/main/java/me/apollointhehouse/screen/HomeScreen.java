@@ -13,6 +13,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.file.Path;
@@ -48,12 +50,14 @@ public class HomeScreen implements Screen {
         window.setVisible(true);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 5));
+//        panel.setLayout(new GridLayout(3, 1));
+        panel.setLayout(new GridBagLayout());
 
-        panel.add(search);
+        final var searchPanel = addSearch();
+        final var resultsPannel = addResults();
 
-        panel.add(searchBtn);
-        panel.add(result);
+        panel.add(searchPanel);
+        panel.add(resultsPannel);
 
         window.add(panel, BorderLayout.CENTER);
 
@@ -77,5 +81,25 @@ public class HomeScreen implements Screen {
                 });
             }
         });
+    }
+
+    public JPanel addSearch() {
+        JPanel searchPanel = new JPanel();
+        searchPanel.setLayout(new GridLayout(2, 1));
+
+        searchPanel.add(search);
+        searchPanel.add(searchBtn);
+
+        return searchPanel;
+    }
+
+    public JPanel addResults() {
+        JPanel resultPanel = new JPanel();
+        resultPanel.setLayout(new GridLayout(1, 1));
+
+        result.setSize(500, 200);
+        resultPanel.add(result);
+
+        return resultPanel;
     }
 }
