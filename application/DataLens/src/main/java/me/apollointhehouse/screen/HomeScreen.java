@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -21,13 +21,14 @@ import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import org.jdesktop.xswingx.PromptSupport;
 
 public class HomeScreen implements Screen {
     private static final Logger logger = LogManager.getLogger(HomeScreen.class);
 
     private final Window window;
 
-    private final JTextField search = new JTextField("\uD83D\uDD0D Search", 30);
+    private final JTextField search = new JTextField("", 30);
     private final JButton searchBtn = new JButton("Search");
     private final JTable result = new JTable();
 
@@ -53,11 +54,19 @@ public class HomeScreen implements Screen {
 //        panel.setLayout(new GridLayout(3, 1));
         panel.setLayout(new GridBagLayout());
 
+        GridBagConstraints gbc = new GridBagConstraints();
+
         final var searchPanel = addSearch();
         final var resultsPannel = addResults();
 
-        panel.add(searchPanel);
-        panel.add(resultsPannel);
+        gbc.anchor = GridBagConstraints.LINE_END;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(searchPanel, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(resultsPannel, gbc);
 
         window.add(panel, BorderLayout.CENTER);
 
@@ -67,6 +76,9 @@ public class HomeScreen implements Screen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String query = search.getText();
+                search.setText("");
+
+                searchBtn.setText("Locating: " + query);
 
                 future.cancel(true);
 
@@ -74,10 +86,13 @@ public class HomeScreen implements Screen {
                 future = executor.submit(() -> {
                     var results = new SearchResults(locator.locate(query).stream().toList());
                     result.setModel(results);
+//                    results.addTableModelListener((l) -> {
+//                        l.
+//                    });
                     var elapsed = System.currentTimeMillis() - start;
 
+                    searchBtn.setText("Search");
                     logger.info("Elapsed: {}", elapsed);
-//                    logger.info(paths.toString());
                 });
             }
         });
@@ -86,6 +101,8 @@ public class HomeScreen implements Screen {
     public JPanel addSearch() {
         JPanel searchPanel = new JPanel();
         searchPanel.setLayout(new GridLayout(2, 1));
+
+        PromptSupport.setPrompt("\uD83D\uDD0D Search", search);
 
         searchPanel.add(search);
         searchPanel.add(searchBtn);

@@ -19,6 +19,7 @@ dependencies {
     // UI
     implementation("com.formdev:flatlaf:3.5.4")
     implementation("com.miglayout:miglayout-swing:11.2")
+    implementation("com.lafouche:xswingx:0.20")
 
     // Logging
     implementation("org.apache.logging.log4j:log4j-api:2.24.3")

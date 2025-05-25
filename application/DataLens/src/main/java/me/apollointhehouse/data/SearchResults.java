@@ -21,17 +21,17 @@ public class SearchResults extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return 1;
-    }
-
-    @Override
-    public int getColumnCount() {
         return paths.size();
     }
 
     @Override
+    public int getColumnCount() {
+        return paths.size() / 5 + 1;
+    }
+
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        final var path = paths.get(columnIndex);
+        final var path = paths.get(rowIndex);
         final var name = path.getFileName().toString();
 
         var typeIndex = name.lastIndexOf('.');
