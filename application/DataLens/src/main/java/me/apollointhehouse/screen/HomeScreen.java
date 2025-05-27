@@ -1,16 +1,17 @@
 package me.apollointhehouse.screen;
 
 import me.apollointhehouse.data.QueryLocator;
-import me.apollointhehouse.data.SearchResults;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.border.TitledBorder;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -30,7 +31,7 @@ public class HomeScreen implements Screen {
 
     private final JTextField search = new JTextField("", 30);
     private final JButton searchBtn = new JButton("Search");
-    private final JTable result = new JTable();
+//    private final JPanel resultsContainer = new JPanel();
 
     private final QueryLocator<@NotNull String, @NotNull Path> locator;
     private final ExecutorService executor;
@@ -57,7 +58,7 @@ public class HomeScreen implements Screen {
         GridBagConstraints gbc = new GridBagConstraints();
 
         final var searchPanel = addSearch();
-        final var resultsPannel = addResults();
+        final var resultsPanel = addResults();
 
         gbc.anchor = GridBagConstraints.LINE_END;
         gbc.gridx = 0;
@@ -66,7 +67,7 @@ public class HomeScreen implements Screen {
 
         gbc.gridx = 0;
         gbc.gridy = 1;
-        panel.add(resultsPannel, gbc);
+        panel.add(resultsPanel, gbc);
 
         window.add(panel, BorderLayout.CENTER);
 
@@ -84,11 +85,15 @@ public class HomeScreen implements Screen {
 
                 var start = System.currentTimeMillis();
                 future = executor.submit(() -> {
-                    var results = new SearchResults(locator.locate(query).stream().toList());
-                    result.setModel(results);
-//                    results.addTableModelListener((l) -> {
-//                        l.
-//                    });
+                    resultsPanel.removeAll();
+                    locator.locate(query).forEach((path) -> {
+                        final var result = new JPanel();
+                        final var name = new JLabel(path.getFileName().toString());
+                        result.add(name);
+                        result.setBorder(new TitledBorder(""));
+
+                        resultsPanel.add(result);
+                    });
                     var elapsed = System.currentTimeMillis() - start;
 
                     searchBtn.setText("Search");
@@ -112,10 +117,9 @@ public class HomeScreen implements Screen {
 
     public JPanel addResults() {
         JPanel resultPanel = new JPanel();
-        resultPanel.setLayout(new GridLayout(1, 1));
+        resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
 
-        result.setSize(500, 200);
-        resultPanel.add(result);
+//        resultPanel.setSize(500, 200);
 
         return resultPanel;
     }
