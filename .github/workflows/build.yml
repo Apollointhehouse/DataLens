@@ -23,13 +23,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Make gradlew executable
-        run: chmod +x ./gradlew
+        run: chmod +x application/DataLens/gradlew
 
-      - name: Run build and execute with Gradle wrapper
+      - name: Build using gradle
         id: gradle
-        working-directory: ./
+        working-directory: application/DataLens/
         run: |
-          ./gradlew build  # Build the project and produce the JAR
+          ./gradlew build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
