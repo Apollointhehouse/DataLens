@@ -47,8 +47,12 @@ compose.desktop {
         mainClass = "MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "StopWatchComposeDesktop"
+            packageName = "DataLens"
             packageVersion = "1.0.0"
+        }
+
+        buildTypes.release.proguard {
+            isEnabled.set(false)
         }
     }
 }
