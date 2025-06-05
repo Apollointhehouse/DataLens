@@ -31,6 +31,8 @@ dependencies {
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
+    // Testing Frameworks
+    testImplementation(kotlin("test"))
 }
 
 kotlin {
@@ -54,6 +56,10 @@ tasks {
         from(dependencies)
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 //compose.desktop {

@@ -1,4 +1,4 @@
-package me.apollointhehouse.components
+package me.apollointhehouse.ui.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,12 +31,23 @@ fun Results(searchResults: Set<Path>) {
                 // Inside the Card, create a Row to display the file name and an "Open" button
                 Row {
                     Text(
-                        text = item.fileName.toString(),
+                        text = item.fileName?.toString() ?: item.toString(),
                         modifier = Modifier
                             .padding(16.dp)
                             .width(300.dp),
                     )
-                    Spacer(Modifier.width(16.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Button(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .width(360.dp),
+                        onClick = {
+                            open(item.parent)
+                        },
+                    ) {
+                        Text(text = "Open Location")
+                    }
+                    Spacer(Modifier.width(4.dp))
                     Button(
                         modifier = Modifier
                             .padding(8.dp)

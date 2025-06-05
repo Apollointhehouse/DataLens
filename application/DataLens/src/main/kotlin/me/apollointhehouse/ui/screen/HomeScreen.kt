@@ -1,4 +1,4 @@
-package me.apollointhehouse.screen
+package me.apollointhehouse.ui.screen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -16,8 +16,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
-import me.apollointhehouse.components.Results
-import me.apollointhehouse.data.QueryLocator
+import me.apollointhehouse.ui.components.Results
+import me.apollointhehouse.data.locator.QueryLocator
 import java.nio.file.Path
 import kotlin.time.measureTime
 
@@ -44,6 +44,7 @@ fun HomeScreen(
                 val elapsed = measureTime {
                     searchResults = locator.locate(query)
                 }
+                logger.info { "Results: $searchResults" }
                 logger.info { "Elapsed: $elapsed" }
             }
     }

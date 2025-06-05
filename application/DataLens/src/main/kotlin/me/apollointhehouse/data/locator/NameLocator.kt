@@ -1,13 +1,10 @@
-package me.apollointhehouse.data
+package me.apollointhehouse.data.locator
 
 import info.debatty.java.stringsimilarity.interfaces.StringDistance
 import io.github.oshai.kotlinlogging.KotlinLogging
-import java.nio.file.FileVisitResult
-import java.nio.file.Files
+import me.apollointhehouse.data.io.visitor
 import java.nio.file.Path
 import java.util.*
-import java.util.function.ToDoubleFunction
-import kotlin.io.path.fileVisitor
 import kotlin.io.path.visitFileTree
 
 private val logger = KotlinLogging.logger {}
@@ -15,31 +12,7 @@ private val logger = KotlinLogging.logger {}
 class NameLocator(private val usr: Path, private val algo: StringDistance) : QueryLocator<String, Set<Path>> {
     override suspend fun locate(query: String): Set<Path> {
         val files = mutableListOf<Path>()
-
-        val visitor = fileVisitor {
-            onPreVisitDirectory { path, _ ->
-                // Skip directories that are not readable
-                if (Files.isReadable(path)) FileVisitResult.CONTINUE else FileVisitResult.SKIP_SUBTREE
-            }
-
-            onVisitFile { path, _ ->
-                val name = path.fileName.toString()
-                // Exclude Recycle Bin system files
-                if (name.startsWith("\$I") || name.startsWith("\$R")) return@onVisitFile FileVisitResult.SKIP_SIBLINGS
-                if (!Files.isReadable(path)) return@onVisitFile FileVisitResult.SKIP_SUBTREE
-                if (Files.isHidden(path)) return@onVisitFile FileVisitResult.SKIP_SIBLINGS
-
-                // Add the file to the list of files to search
-                files.add(path)
-
-                FileVisitResult.CONTINUE
-            }
-
-            onVisitFileFailed { path, _ ->
-                // Skip files that cannot be visited
-                FileVisitResult.SKIP_SUBTREE
-            }
-        }
+        val visitor = visitor(files)
 
         try {
             // Visit file tree up to a max depth of 4 in order to avoid performance issues
@@ -55,11 +28,11 @@ class NameLocator(private val usr: Path, private val algo: StringDistance) : Que
 
         return files
             .asSequence() // Use sequence to avoid creating intermediate lists (performance optimization)
-            .sortedWith(Comparator.comparingDouble(ToDoubleFunction { p: Path ->
+            .sortedWith(Comparator.comparingDouble { p: Path ->
                 // Calculate the distance between the file name and the query then sort by it
                 val name = p.fileName.toString()
                 algo.distance(name.lowercase(Locale.getDefault()), query.lowercase(Locale.getDefault()))
-            }))
+            })
             .filter { p ->
                 // Filter out files that are not similar enough to the query
                 val name = p.fileName.toString()
