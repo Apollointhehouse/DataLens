@@ -1,12 +1,18 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
 plugins {
-    id("java")
+    kotlin("jvm") version "2.1.20"
+    id("org.jetbrains.compose") version "1.8.1"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.1.20"
 }
 
 group = "me.apollointhehouse"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 repositories {
+    google()
     mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 dependencies {
@@ -17,38 +23,32 @@ dependencies {
     implementation("com.github.vatbub:mslinks:1.0.6.2")
 
     // UI
-    implementation("com.formdev:flatlaf:3.5.4")
-    implementation("com.miglayout:miglayout-swing:11.2")
-    implementation("com.lafouche:xswingx:0.20")
+    implementation(compose.desktop.currentOs)
 
     // Logging
     implementation("org.apache.logging.log4j:log4j-api:2.24.3")
     implementation("org.apache.logging.log4j:log4j-core:2.24.3")
     implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.3")
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
 
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
-//    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-//    testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
-tasks {
-    withType<JavaCompile>().configureEach {
-        options.release = 21
-    }
-
-    jar {
-        manifest.attributes["Main-Class"] = "me.apollointhehouse.Main"
-        val dependencies = configurations
-            .runtimeClasspath
-            .get()
-            .map { zipTree(it) }
-        from(dependencies)
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "StopWatchComposeDesktop"
+            packageVersion = "1.0.0"
+        }
     }
 }
