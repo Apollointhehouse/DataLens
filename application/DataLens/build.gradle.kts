@@ -1,5 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-
 plugins {
     kotlin("jvm") version "2.1.20"
     id("org.jetbrains.compose") version "1.8.1"
@@ -20,7 +18,6 @@ dependencies {
     implementation("info.debatty:java-string-similarity:2.0.0")
     implementation("org.jetbrains:annotations:24.0.0")
     implementation("commons-io:commons-io:2.19.0")
-    implementation("com.github.vatbub:mslinks:1.0.6.2")
 
     // UI
     implementation(compose.desktop.currentOs)
@@ -42,17 +39,34 @@ kotlin {
     }
 }
 
-compose.desktop {
-    application {
-        mainClass = "MainKt"
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "DataLens"
-            packageVersion = "1.0.0"
-        }
+tasks {
+    withType<JavaCompile>().configureEach {
+        options.release = 21
+    }
 
-        buildTypes.release.proguard {
-            isEnabled.set(false)
-        }
+    jar {
+        manifest.attributes["Main-Class"] = "me.apollointhehouse.MainKt"
+
+        val dependencies = configurations
+            .runtimeClasspath
+            .get()
+            .map { zipTree(it) }
+        from(dependencies)
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 }
+
+//compose.desktop {
+//    application {
+//        mainClass = "MainKt"
+//        nativeDistributions {
+//            targetFormats(TargetFormat.Msi, TargetFormat.Exe)
+//            packageName = "DataLens"
+//            packageVersion = "1.0.0"
+//        }
+//
+//        buildTypes.release.proguard {
+//            isEnabled.set(false)
+//        }
+//    }
+//}
