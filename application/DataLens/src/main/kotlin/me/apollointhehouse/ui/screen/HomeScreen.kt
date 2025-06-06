@@ -1,5 +1,6 @@
 package me.apollointhehouse.ui.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.MaterialTheme
@@ -16,6 +17,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import me.apollointhehouse.ui.components.Results
 import me.apollointhehouse.data.locator.QueryLocator
 import java.nio.file.Path
@@ -29,7 +32,6 @@ fun HomeScreen(
     locator: QueryLocator<String, Set<Path>>,
 ) {
     val searchText = rememberTextFieldState()
-
     var searchResults by remember { mutableStateOf<Set<Path>>(emptySet()) }
 
     // Observe changes in the search text and perform search
@@ -37,15 +39,18 @@ fun HomeScreen(
         snapshotFlow { searchText.text }
             .debounce(250)
             .distinctUntilChanged()
-            .flowOn(Dispatchers.IO) // Perform search on IO dispatcher in order to avoid blocking the UI thread
             .collectLatest {
-                val query = searchText.text.toString()
-                // Measure the time taken for the search operation and log it (visibility of system status)
-                val elapsed = measureTime {
-                    searchResults = locator.locate(query)
+                // Run the search operation in the IO dispatcher to avoid blocking the main thread
+                withContext(Dispatchers.IO) {
+                    val query = it.toString()
+
+                    // Measure the time taken for the search operation and log it (visibility of system status)
+                    val elapsed = measureTime {
+                        searchResults = locator.locate(query)
+                    }
+                    logger.info { "Results: $searchResults" }
+                    logger.info { "Elapsed: $elapsed" }
                 }
-                logger.info { "Results: $searchResults" }
-                logger.info { "Elapsed: $elapsed" }
             }
     }
 
@@ -55,6 +60,7 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
+                .background(MaterialTheme.colors.background)
         ) {
             // Center the content in the Box and list the components vertically
             Column(

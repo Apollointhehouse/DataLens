@@ -1,15 +1,16 @@
 package me.apollointhehouse.ui.components
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.awt.Desktop
@@ -20,43 +21,53 @@ private val logger = KotlinLogging.logger {}
 
 @Composable
 fun Results(searchResults: Set<Path>) {
-    Column {
+    LazyColumn (
+        modifier = Modifier
+            .padding(16.dp)
+            .height(600.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colors.onSecondary)
+    ) {
         for (item in searchResults) {
-            // Create a Card for each search result item
-            Card(
-                modifier = Modifier
-                    .width(500.dp)
-                    .padding(8.dp)
-            ) {
-                // Inside the Card, create a Row to display the file name and an "Open" button
-                Row {
-                    Text(
-                        text = item.fileName?.toString() ?: item.toString(),
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .width(300.dp),
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Button(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .width(360.dp),
-                        onClick = {
-                            open(item.parent)
-                        },
-                    ) {
-                        Text(text = "Open Location")
-                    }
-                    Spacer(Modifier.width(4.dp))
-                    Button(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .width(180.dp),
-                        onClick = {
-                            open(item)
-                        },
-                    ) {
-                        Text(text = "Open")
+            item {
+                // Create a Card for each search result item
+                Card(
+                    modifier = Modifier
+                        .width(700.dp)
+                        .padding(8.dp)
+                ) {
+                    // Inside the Card, create a Row to display the file name and an "Open" button
+                    Row {
+                        Text(
+                            text = item.fileName?.toString() ?: item.toString(),
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .width(300.dp),
+                        )
+
+                        Spacer(Modifier.weight(1f, true))
+
+                        Button(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .width(120.dp),
+                            onClick = {
+                                open(item.parent)
+                            },
+                        ) {
+                            Text(text = "Open Location")
+                        }
+                        Spacer(Modifier.width(4.dp))
+                        Button(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .width(120.dp),
+                            onClick = {
+                                open(item)
+                            },
+                        ) {
+                            Text(text = "Open")
+                        }
                     }
                 }
             }
