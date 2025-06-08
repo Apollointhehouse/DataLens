@@ -10,7 +10,7 @@ import java.nio.file.Path
 
 private val logger = KotlinLogging.logger {}
 
-private val usr = Path.of(System.getProperty("user.home"))
+private val usr = Path.of("C:\\")
 
 fun main() = application {
     logger.info { "DataLens Initialised!" }

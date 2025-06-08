@@ -16,11 +16,9 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import me.apollointhehouse.ui.components.Results
 import me.apollointhehouse.data.locator.QueryLocator
+import me.apollointhehouse.ui.components.Results
 import java.nio.file.Path
 import kotlin.time.measureTime
 
@@ -37,18 +35,20 @@ fun HomeScreen(
     // Observe changes in the search text and perform search
     LaunchedEffect(searchText.text) {
         snapshotFlow { searchText.text }
-            .debounce(250)
+            .debounce(350) // Debounce to avoid too many search operations
             .distinctUntilChanged()
             .collectLatest {
                 // Run the search operation in the IO dispatcher to avoid blocking the main thread
                 withContext(Dispatchers.IO) {
                     val query = it.toString()
 
+                    logger.info { "Searching: $query" }
+
                     // Measure the time taken for the search operation and log it (visibility of system status)
                     val elapsed = measureTime {
                         searchResults = locator.locate(query)
                     }
-                    logger.info { "Results: $searchResults" }
+//                    logger.info { "Results: $searchResults" }
                     logger.info { "Elapsed: $elapsed" }
                 }
             }
