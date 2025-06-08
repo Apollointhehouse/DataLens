@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withContext
+import me.apollointhehouse.data.SearchResults
 import me.apollointhehouse.data.locator.QueryLocator
 import me.apollointhehouse.ui.components.Results
 import java.nio.file.Path
@@ -30,26 +31,30 @@ fun HomeScreen(
     locator: QueryLocator<String, Set<Path>>,
 ) {
     val searchText = rememberTextFieldState()
-    var searchResults by remember { mutableStateOf<Set<Path>>(emptySet()) }
+    var searchResults by remember { mutableStateOf(SearchResults(emptySet())) }
+    var isLocating by remember { mutableStateOf(false) }
 
     // Observe changes in the search text and perform search
     LaunchedEffect(searchText.text) {
         snapshotFlow { searchText.text }
-            .debounce(350) // Debounce to avoid too many search operations
+            .debounce(700) // Debounce to avoid too many search operations
             .distinctUntilChanged()
             .collectLatest {
                 // Run the search operation in the IO dispatcher to avoid blocking the main thread
                 withContext(Dispatchers.IO) {
                     val query = it.toString()
 
+                    searchResults = SearchResults(emptySet()) // Clear previous results
                     logger.info { "Searching: $query" }
+                    isLocating = true // Set locating state to true
 
                     // Measure the time taken for the search operation and log it (visibility of system status)
                     val elapsed = measureTime {
-                        searchResults = locator.locate(query)
+                        searchResults = SearchResults(locator.locate(query))
                     }
 //                    logger.info { "Results: $searchResults" }
                     logger.info { "Elapsed: $elapsed" }
+                    isLocating = false // Set locating state to false
                 }
             }
     }
@@ -72,6 +77,21 @@ fun HomeScreen(
                     state = searchText,
                     placeholder = { Text(text = "Search...") },
                 )
+                if (isLocating) {
+                    // Show a loading indicator while searching
+                    Text(
+                        text = "Locating...",
+                        modifier = Modifier.padding(top = 8.dp),
+                        style = MaterialTheme.typography.body2
+                    )
+                } else {
+                    // Show the number of results found
+                    Text(
+                        text = "${searchResults.results.size} results found:",
+                        modifier = Modifier.padding(top = 8.dp),
+                        style = MaterialTheme.typography.body2
+                    )
+                }
 
                 Spacer(modifier = Modifier.padding(16.dp))
 

@@ -9,7 +9,10 @@ import kotlin.io.path.visitFileTree
 
 private val logger = KotlinLogging.logger {}
 
-class NameLocator(private val base: Path, private val algo: StringDistance) : QueryLocator<String, Set<Path>> {
+class NameLocator(
+    private val base: Path,
+    private val algo: StringDistance,
+) : QueryLocator<String, Set<Path>> {
     private val index = mutableMapOf<String, Path>()
 
     override suspend fun locate(query: String): Set<Path> {
@@ -26,7 +29,7 @@ class NameLocator(private val base: Path, private val algo: StringDistance) : Qu
             return emptySet()
         }
 
-        return index.values
+        val res = index.values
             .asSequence() // Use sequence to avoid creating intermediate lists (performance optimization)
             .sortedWith(Comparator.comparingDouble { p: Path ->
                 // Calculate the distance between the file name and the query then sort by it
@@ -38,7 +41,8 @@ class NameLocator(private val base: Path, private val algo: StringDistance) : Qu
                 val name = p.fileName.toString()
                 algo.distance(name.lowercase(), query.lowercase()) < MAX_DIST
             }
-            .toSet()
+
+        return res.toSet()
     }
 
     companion object {
@@ -46,7 +50,7 @@ class NameLocator(private val base: Path, private val algo: StringDistance) : Qu
          * Maximum distance for a match to be considered relevant.
          * This value is based on the StringDistance algorithm used.
          */
-        private const val MAX_DIST = 0.92
+        private const val MAX_DIST = 0.8
 
         /**
          * The maximum depth to search.

@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import io.github.oshai.kotlinlogging.KotlinLogging
+import me.apollointhehouse.data.SearchResults
 import java.awt.Desktop
 import java.io.IOException
 import java.nio.file.Path
@@ -20,7 +21,7 @@ import java.nio.file.Path
 private val logger = KotlinLogging.logger {}
 
 @Composable
-fun Results(searchResults: Set<Path>) {
+fun Results(searchResults: SearchResults) {
     LazyColumn (
         modifier = Modifier
             .padding(16.dp)
@@ -28,7 +29,7 @@ fun Results(searchResults: Set<Path>) {
             .clip(RoundedCornerShape(8.dp))
             .background(MaterialTheme.colors.onSecondary)
     ) {
-        for (item in searchResults) {
+        for (path in searchResults.results) {
             item {
                 // Create a Card for each search result item
                 Card(
@@ -39,7 +40,7 @@ fun Results(searchResults: Set<Path>) {
                     // Inside the Card, create a Row to display the file name and an "Open" button
                     Row {
                         Text(
-                            text = item.fileName?.toString() ?: item.toString(),
+                            text = path.fileName?.toString() ?: path.toString(),
                             modifier = Modifier
                                 .padding(16.dp)
                                 .width(300.dp),
@@ -52,7 +53,7 @@ fun Results(searchResults: Set<Path>) {
                                 .padding(8.dp)
                                 .width(120.dp),
                             onClick = {
-                                open(item.parent)
+                                open(path.parent)
                             },
                         ) {
                             Text(text = "Open Location")
@@ -63,7 +64,7 @@ fun Results(searchResults: Set<Path>) {
                                 .padding(8.dp)
                                 .width(120.dp),
                             onClick = {
-                                open(item)
+                                open(path)
                             },
                         ) {
                             Text(text = "Open")
