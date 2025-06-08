@@ -21,6 +21,10 @@ fun visitor(index: MutableMap<String, Path>) = fileVisitor {
             return@onPreVisitDirectory FileVisitResult.SKIP_SUBTREE
         }
 
+        if (Files.isHidden(path)) {
+            return@onPreVisitDirectory FileVisitResult.SKIP_SUBTREE
+        }
+
         FileVisitResult.CONTINUE
     }
 

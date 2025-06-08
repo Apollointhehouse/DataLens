@@ -10,7 +10,8 @@ import java.nio.file.Path
 
 private val logger = KotlinLogging.logger {}
 
-private val usr = Path.of("C:\\")
+private val base = Path.of("C:\\")
+//private val base = Path.of(System.getProperty("user.home"))
 
 fun main() = application {
     logger.info { "DataLens Initialised!" }
@@ -21,6 +22,6 @@ fun main() = application {
 
     Window(onCloseRequest = ::exitApplication) {
         // Uses dependency injection to provide the NameLocator instance to the HomeScreen (allows for easy testing/swapping of components)
-        HomeScreen(NameLocator(usr, Jaccard()))
+        HomeScreen(NameLocator(base, Jaccard()))
     }
 }

@@ -46,7 +46,7 @@ class NameLocator(private val base: Path, private val algo: StringDistance) : Qu
          * Maximum distance for a match to be considered relevant.
          * This value is based on the StringDistance algorithm used.
          */
-        private const val MAX_DIST = 0.98
+        private const val MAX_DIST = 0.92
 
         /**
          * The maximum depth to search.
