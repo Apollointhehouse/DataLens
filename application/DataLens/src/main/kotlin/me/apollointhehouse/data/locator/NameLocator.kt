@@ -13,7 +13,7 @@ class NameLocator(
     private val algo: StringDistance,
     private val index: MutableMap<String, Path> = mutableMapOf()
 ) : QueryLocator<String, Set<Path>> {
-    private val hidden: MutableMap<String, Path> = mutableMapOf()
+    private val hidden: MutableSet<String> = mutableSetOf()
 
     private val visitor = visitor(index, hidden)
 
