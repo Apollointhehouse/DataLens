@@ -8,7 +8,7 @@ import kotlin.io.path.fileVisitor
 
 private val logger = KotlinLogging.logger {}
 
-fun visitor(index: MutableMap<String, Path>) = fileVisitor {
+fun visitor(index: MutableMap<String, Path>, hidden: MutableMap<String, Path>) = fileVisitor {
     onPreVisitDirectory { path, _ ->
         val name = path.fileName?.toString() ?: run {
 //            logger.warn { "File with no name found at $path, skipping." }
@@ -21,7 +21,14 @@ fun visitor(index: MutableMap<String, Path>) = fileVisitor {
             return@onPreVisitDirectory FileVisitResult.SKIP_SUBTREE
         }
 
+        if (name in hidden) {
+            // If the directory is hidden, skip it
+//            logger.info { "Skipping hidden directory: $path" }
+            return@onPreVisitDirectory FileVisitResult.SKIP_SUBTREE
+        }
         if (Files.isHidden(path)) {
+//            logger.info { "Indexing hidden directory: $path" }
+            hidden[name] = path
             return@onPreVisitDirectory FileVisitResult.SKIP_SUBTREE
         }
 
@@ -42,7 +49,7 @@ fun visitor(index: MutableMap<String, Path>) = fileVisitor {
 
         // Exclude Recycle Bin system files
         if (name.startsWith("\$I") || name.startsWith("\$R")) return@onVisitFile FileVisitResult.SKIP_SIBLINGS
-        if (name.lowercase().startsWith("ntuser")) return@onVisitFile FileVisitResult.SKIP_SUBTREE
+        if (name.lowercase().startsWith("ntuser")) return@onVisitFile FileVisitResult.CONTINUE
 
         // Skip hidden files
         if (Files.isHidden(path)) {
