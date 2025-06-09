@@ -26,12 +26,12 @@ class NameLocator(
 
         val res = index
             .asSequence() // Use sequence to avoid creating intermediate lists (performance optimization)
-            .map { (name, p) -> p to algo.distance(name.lowercase(), query.lowercase()) }
-            .sortedWith(Comparator.comparingDouble { (_, dist) -> dist }) // Sort by distance
+            .map { (name, p) -> p to algo.distance(name.lowercase(), query.lowercase()) } // Calculate distance to query for each file name
             .filter { (_, dist) -> dist < MAX_DIST } // Filter out files that are not similar enough to the query
+            .sortedWith(Comparator.comparingDouble { (_, dist) -> dist }) // Sort by distance to query
             .map { (path, _) -> path } // Extract the paths
 
-        return res.toSet()
+        return res.toSet() // Convert the sequence to a set to return unique paths
     }
 
     companion object {
