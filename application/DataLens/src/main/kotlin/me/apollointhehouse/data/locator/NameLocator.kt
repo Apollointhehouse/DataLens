@@ -9,7 +9,7 @@ import kotlin.io.path.visitFileTree
 private val logger = KotlinLogging.logger {}
 
 class NameLocator(
-    private val base: Path,
+    private val basePaths: List<Path>,
     private val algo: StringDistance,
     private val index: MutableMap<String, Path> = mutableMapOf()
 ) : QueryLocator<String, Set<Path>> {
@@ -18,9 +18,9 @@ class NameLocator(
     private val visitor = visitor(index, hidden)
 
     override suspend fun locate(query: String): Set<Path> {
-        runCatching { base.visitFileTree(visitor, maxDepth = MAX_DEPTH) }
+        runCatching { for (base in basePaths) base.visitFileTree(visitor, maxDepth = MAX_DEPTH) }
             .onFailure {
-                logger.error(it) { "Error while visiting files in $base" }
+                logger.error(it) { "Error while visiting files" }
                 return emptySet()
             }
 
@@ -39,7 +39,7 @@ class NameLocator(
          * Maximum distance for a match to be considered relevant.
          * This value is based on the StringDistance algorithm used.
          */
-        private const val MAX_DIST = 0.8
+        private const val MAX_DIST = 0.92
 
         /**
          * The maximum depth to search.
