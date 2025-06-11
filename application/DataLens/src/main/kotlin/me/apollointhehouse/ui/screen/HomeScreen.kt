@@ -33,6 +33,7 @@ fun HomeScreen(
     val searchText = rememberTextFieldState()
     var searchResults by remember { mutableStateOf(SearchResults(emptySet())) }
     var isLocating by remember { mutableStateOf(false) }
+    var isIndexing by remember { mutableStateOf(true) }
 
     // Observe changes in the search text and perform search
     LaunchedEffect(searchText.text) {
@@ -80,7 +81,7 @@ fun HomeScreen(
                 if (isLocating) {
                     // Show a loading indicator while searching
                     Text(
-                        text = "Locating...",
+                        text = if (!isIndexing) "Locating..." else "Indexing file system...",
                         modifier = Modifier.padding(top = 8.dp),
                         style = MaterialTheme.typography.body2
                     )

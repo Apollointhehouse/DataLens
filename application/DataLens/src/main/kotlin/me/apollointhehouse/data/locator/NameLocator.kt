@@ -3,6 +3,7 @@ package me.apollointhehouse.data.locator
 import info.debatty.java.stringsimilarity.interfaces.StringDistance
 import io.github.oshai.kotlinlogging.KotlinLogging
 import me.apollointhehouse.data.io.visitor
+import java.nio.file.FileVisitor
 import java.nio.file.Path
 import kotlin.io.path.visitFileTree
 
@@ -18,11 +19,9 @@ class NameLocator(
     private val visitor = visitor(index, hidden)
 
     override suspend fun locate(query: String): Set<Path> {
-        runCatching { for (base in basePaths) base.visitFileTree(visitor, maxDepth = MAX_DEPTH) }
-            .onFailure {
-                logger.error(it) { "Error while visiting files" }
-                return emptySet()
-            }
+        if (index.isEmpty()) {
+            indexFiles(visitor) // Index files if the index is empty
+        }
 
         val res = index
             .asSequence() // Use sequence to avoid creating intermediate lists (performance optimization)
@@ -32,6 +31,14 @@ class NameLocator(
             .map { (path, _) -> path } // Extract the paths
 
         return res.toSet() // Convert the sequence to a set to return unique paths
+    }
+
+    private fun indexFiles(visitor: FileVisitor<Path>) {
+        logger.info { "Indexing files..." }
+        runCatching { for (base in basePaths) base.visitFileTree(visitor, maxDepth = MAX_DEPTH) }
+            .onFailure {
+                logger.error(it) { "Error while indexing files" }
+            }
     }
 
     companion object {

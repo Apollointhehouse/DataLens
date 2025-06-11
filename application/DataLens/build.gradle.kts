@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     kotlin("jvm") version "2.1.20"
     id("org.jetbrains.compose") version "1.8.1"
@@ -36,14 +38,16 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    }
+//    jvmToolchain {
+//        languageVersion.set(JavaLanguageVersion.of(21))
+//    }
+
+    compilerOptions.jvmTarget = JvmTarget.JVM_11
 }
 
 tasks {
     withType<JavaCompile>().configureEach {
-        options.release = 21
+        options.release = 11
     }
 
     jar {

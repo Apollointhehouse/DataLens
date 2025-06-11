@@ -23,6 +23,8 @@ fun main() = application {
         Path.of("\\\\internal.rotorualakes.school.nz\\Users\\Home\\")
     )
 
+    println("Base paths: $basePaths")
+
     Window(onCloseRequest = ::exitApplication) {
         // Uses dependency injection to provide the NameLocator instance to the HomeScreen (allows for easy testing/swapping of components)
         HomeScreen(NameLocator(basePaths, Jaccard()))
