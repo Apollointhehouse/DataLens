@@ -56,6 +56,7 @@ fun HomeScreen(
 //                    logger.info { "Results: $searchResults" }
                     logger.info { "Elapsed: $elapsed" }
                     isLocating = false // Set locating state to false
+                    isIndexing = false
                 }
             }
     }

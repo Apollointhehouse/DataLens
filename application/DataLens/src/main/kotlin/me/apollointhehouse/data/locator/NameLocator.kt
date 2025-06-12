@@ -52,6 +52,6 @@ class NameLocator(
          * The maximum depth to search.
          * This is a performance optimization to avoid searching too deep into the file system.
          */
-        private const val MAX_DEPTH = 10
+        private const val MAX_DEPTH = 19
     }
 }
