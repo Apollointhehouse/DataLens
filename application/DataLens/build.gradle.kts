@@ -15,6 +15,16 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
+val exposedVersion: String by project
+val jdbcVersion: String by project
+
+val kotlinResultVersion: String by project
+
+val coroutinesVersion: String by project
+
+val log4jVersion: String by project
+val kotlinLoggingVersion: String by project
+
 dependencies {
     // Utils
     implementation("info.debatty:java-string-similarity:2.0.0")
@@ -25,16 +35,26 @@ dependencies {
     implementation(compose.desktop.currentOs)
 
     // Logging
-    implementation("org.apache.logging.log4j:log4j-api:2.24.3")
-    implementation("org.apache.logging.log4j:log4j-core:2.24.3")
-    implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.24.3")
-    implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
+    implementation("org.apache.logging.log4j:log4j-api:$log4jVersion")
+    implementation("org.apache.logging.log4j:log4j-core:$log4jVersion")
+    implementation("org.apache.logging.log4j:log4j-slf4j2-impl:$log4jVersion")
+    implementation("io.github.oshai:kotlin-logging-jvm:$kotlinLoggingVersion")
 
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+
+    // Exposed for database access (sqlite)
+    implementation("org.xerial:sqlite-jdbc:${jdbcVersion}")
+    implementation("org.jetbrains.exposed:exposed-core:${exposedVersion}")
+    implementation("org.jetbrains.exposed:exposed-dao:${exposedVersion}")
+    implementation("org.jetbrains.exposed:exposed-jdbc:${exposedVersion}")
 
     // Testing Frameworks
     testImplementation(kotlin("test"))
+
+    // Result type
+    implementation("com.michael-bull.kotlin-result:kotlin-result:$kotlinResultVersion")
+    implementation("com.michael-bull.kotlin-result:kotlin-result-coroutines:$kotlinResultVersion")
 }
 
 kotlin {

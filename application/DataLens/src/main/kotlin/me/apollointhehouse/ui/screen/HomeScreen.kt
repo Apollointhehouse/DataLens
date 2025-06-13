@@ -10,6 +10,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -18,6 +20,8 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withContext
 import me.apollointhehouse.data.SearchResults
+import me.apollointhehouse.data.locator.LocatorError
+import me.apollointhehouse.data.locator.LocatorState
 import me.apollointhehouse.data.locator.QueryLocator
 import me.apollointhehouse.ui.components.Results
 import java.nio.file.Path
@@ -28,12 +32,11 @@ private val logger = KotlinLogging.logger {}
 @OptIn(FlowPreview::class)
 @Composable
 fun HomeScreen(
-    locator: QueryLocator<String, Set<Path>>,
+    locator: QueryLocator<String, Result<Set<Path>, LocatorError>>,
 ) {
     val searchText = rememberTextFieldState()
-    var searchResults by remember { mutableStateOf(SearchResults(emptySet())) }
-    var isLocating by remember { mutableStateOf(false) }
-    var isIndexing by remember { mutableStateOf(true) }
+    var searchResults by remember { mutableStateOf(SearchResults(Ok(emptySet()))) }
+    val state = locator.state.collectAsState().value
 
     // Observe changes in the search text and perform search
     LaunchedEffect(searchText.text) {
@@ -45,9 +48,8 @@ fun HomeScreen(
                 withContext(Dispatchers.IO) {
                     val query = it.toString()
 
-                    searchResults = SearchResults(emptySet()) // Clear previous results
+                    searchResults = SearchResults(Ok(emptySet())) // Clear previous results
                     logger.info { "Searching: $query" }
-                    isLocating = true // Set locating state to true
 
                     // Measure the time taken for the search operation and log it (visibility of system status)
                     val elapsed = measureTime {
@@ -55,8 +57,6 @@ fun HomeScreen(
                     }
 //                    logger.info { "Results: $searchResults" }
                     logger.info { "Elapsed: $elapsed" }
-                    isLocating = false // Set locating state to false
-                    isIndexing = false
                 }
             }
     }
@@ -79,22 +79,30 @@ fun HomeScreen(
                     state = searchText,
                     placeholder = { Text(text = "Search...") },
                 )
-                if (isLocating) {
-                    // Show a loading indicator while searching
-                    Text(
-                        text = if (!isIndexing) "Locating..." else "Indexing file system...",
-                        modifier = Modifier.padding(top = 8.dp),
-                        style = MaterialTheme.typography.body2
-                    )
-                } else {
-                    // Show the number of results found
-                    Text(
-                        text = "${searchResults.results.size} results found:",
-                        modifier = Modifier.padding(top = 8.dp),
-                        style = MaterialTheme.typography.body2
-                    )
-                }
 
+                when (state) {
+                    is LocatorState.Locating -> {
+                        Text(
+                            text = "Locating...",
+                            modifier = Modifier.padding(top = 8.dp),
+                            style = MaterialTheme.typography.body2
+                        )
+                    }
+                    is LocatorState.Indexing -> {
+                        Text(
+                            text = "Indexing file system...",
+                            modifier = Modifier.padding(top = 8.dp),
+                            style = MaterialTheme.typography.body2
+                        )
+                    }
+                    is LocatorState.Idle -> {
+                        Text(
+                            text = "Ready to search!",
+                            modifier = Modifier.padding(top = 8.dp),
+                            style = MaterialTheme.typography.body2
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.padding(16.dp))
 
                 // Display search results
