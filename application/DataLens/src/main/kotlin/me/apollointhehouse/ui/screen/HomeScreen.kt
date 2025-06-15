@@ -10,8 +10,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.map
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -35,7 +37,7 @@ fun HomeScreen(
     locator: QueryLocator<String, Result<Set<Path>, LocatorError>>,
 ) {
     val searchText = rememberTextFieldState()
-    var searchResults by remember { mutableStateOf(SearchResults(Ok(emptySet()))) }
+    var locatorResults: Result<SearchResults, LocatorError> by remember { mutableStateOf(Err(LocatorError.NoResults)) }
     val state = locator.state.collectAsState().value
 
     // Observe changes in the search text and perform search
@@ -48,12 +50,14 @@ fun HomeScreen(
                 withContext(Dispatchers.IO) {
                     val query = it.toString()
 
-                    searchResults = SearchResults(Ok(emptySet())) // Clear previous results
+                    locatorResults = Ok(SearchResults(emptySet())) // Clear previous results
                     logger.info { "Searching: $query" }
 
                     // Measure the time taken for the search operation and log it (visibility of system status)
                     val elapsed = measureTime {
-                        searchResults = SearchResults(locator.locate(query))
+                        locatorResults = locator
+                            .locate(query)
+                            .map { value -> SearchResults(value) }
                     }
 //                    logger.info { "Results: $searchResults" }
                     logger.info { "Elapsed: $elapsed" }
@@ -106,7 +110,7 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.padding(16.dp))
 
                 // Display search results
-                Results(searchResults)
+                Results(locatorResults)
             }
 
         }

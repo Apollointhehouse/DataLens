@@ -13,9 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.github.michaelbull.result.getOrElse
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.fold
 import io.github.oshai.kotlinlogging.KotlinLogging
 import me.apollointhehouse.data.SearchResults
+import me.apollointhehouse.data.locator.LocatorError
 import java.awt.Desktop
 import java.io.IOException
 import java.nio.file.Path
@@ -23,7 +25,7 @@ import java.nio.file.Path
 private val logger = KotlinLogging.logger {}
 
 @Composable
-fun Results(searchResults: SearchResults) {
+fun Results(locatorResults: Result<SearchResults, LocatorError>) {
     LazyColumn (
         modifier = Modifier
             .padding(16.dp)
@@ -31,24 +33,23 @@ fun Results(searchResults: SearchResults) {
             .clip(RoundedCornerShape(8.dp))
             .background(MaterialTheme.colors.onSecondary)
     ) {
-        val results = searchResults.results.getOrElse {
-            item {
-                // Display an error message if the search results are not valid
-                Text(
-                    text = "Error: Search results are not valid.",
-                    modifier = Modifier.padding(16.dp)
-                )
+        locatorResults.fold(
+            success = { createResultCards(it) },
+            failure = {
+                // Display an error message if the search operation failed
+                item {
+                    Text(
+                        text = "Error: $it.",
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
             }
-
-            return@LazyColumn
-        }
-
-        createResultCards(results)
+        )
     }
 }
 
-private fun LazyListScope.createResultCards(results: Set<Path>) {
-    for (path in results) {
+private fun LazyListScope.createResultCards(results: SearchResults) {
+    for (path in results.paths) {
         item {
             // Create a Card for each search result item
             Card(
