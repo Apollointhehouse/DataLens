@@ -25,6 +25,8 @@ val coroutinesVersion: String by project
 val log4jVersion: String by project
 val kotlinLoggingVersion: String by project
 
+val routingComposeVersion: String by project
+
 dependencies {
     // Utils
     implementation("info.debatty:java-string-similarity:2.0.0")
@@ -33,6 +35,10 @@ dependencies {
 
     // UI
     implementation(compose.desktop.currentOs)
+    implementation("br.com.devsrsouza.compose.icons:font-awesome:1.1.1")
+
+    // Routing
+    implementation("app.softwork:routing-compose:$routingComposeVersion")
 
     // Logging
     implementation("org.apache.logging.log4j:log4j-api:$log4jVersion")

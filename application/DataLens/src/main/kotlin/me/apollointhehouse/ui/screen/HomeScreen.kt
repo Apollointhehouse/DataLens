@@ -3,17 +3,19 @@ package me.apollointhehouse.ui.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import app.softwork.routingcompose.Router
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.map
+import compose.icons.FontAwesomeIcons
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.Cog
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -39,6 +41,8 @@ fun HomeScreen(
     val searchText = rememberTextFieldState()
     var locatorResults: Result<SearchResults, LocatorError> by remember { mutableStateOf(Err(LocatorError.NoResults)) }
     val state = locator.state.collectAsState().value
+
+    val router = Router.current
 
     // Observe changes in the search text and perform search
     LaunchedEffect(searchText.text) {
@@ -78,12 +82,13 @@ fun HomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxSize()
             ) {
+                Spacer(modifier = Modifier.height(16.dp))
+
                 // Input field for search
                 TextField(
                     state = searchText,
                     placeholder = { Text(text = "Search...") },
                 )
-
                 when (state) {
                     is LocatorState.Locating -> {
                         Text(
@@ -108,11 +113,25 @@ fun HomeScreen(
                     }
                 }
                 Spacer(modifier = Modifier.padding(16.dp))
-
                 // Display search results
                 Results(locatorResults)
             }
 
+            // Navigation bar at the bottom
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp),
+            ) {
+                Button(onClick = { router.navigate("/settings") }) {
+                    Icon(
+                        imageVector = FontAwesomeIcons.Solid.Cog,
+                        contentDescription = "Settings",
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
         }
     }
 }

@@ -17,19 +17,19 @@ fun visitor(index: MutableMap<String, Path>, noVisit: MutableSet<String>) = file
 
         if (name in index) {
             // If the directory is already indexed, skip it
-            logger.info { "Directory $name is already indexed, skipping." }
+            logger.debug { "Directory $name is already indexed, skipping." }
             return@onPreVisitDirectory FileVisitResult.SKIP_SUBTREE
         }
 
         // Skip directories that cannot be visited
         if (name in noVisit) {
-            logger.info { "Skipping unvisitable directory: $path" }
+            logger.debug { "Skipping unvisitable directory: $path" }
             return@onPreVisitDirectory FileVisitResult.SKIP_SUBTREE
         }
 
         // Index hidden directories
         if (Files.isHidden(path)) {
-            logger.info { "Indexing hidden directory: $path" }
+            logger.debug { "Indexing hidden directory: $path" }
             noVisit.add(name)
             return@onPreVisitDirectory FileVisitResult.SKIP_SUBTREE
         }
@@ -39,13 +39,13 @@ fun visitor(index: MutableMap<String, Path>, noVisit: MutableSet<String>) = file
 
     onVisitFile { path, _ ->
         val name = path.fileName?.toString() ?: run {
-            logger.warn { "File with no name found at $path, skipping." }
+            logger.debug { "File with no name found at $path, skipping." }
             return@onVisitFile FileVisitResult.CONTINUE
         }
 
         if (name in index) {
             // If the file is already indexed, skip it
-            logger.info { "File $name is already indexed, skipping." }
+            logger.debug { "File $name is already indexed, skipping." }
             return@onVisitFile FileVisitResult.CONTINUE
         }
 
@@ -55,19 +55,19 @@ fun visitor(index: MutableMap<String, Path>, noVisit: MutableSet<String>) = file
 
         // Skip hidden files
         if (name in noVisit) {
-            logger.info { "Skipping hidden directory: $path" }
+            logger.debug { "Skipping hidden directory: $path" }
             return@onVisitFile FileVisitResult.CONTINUE
         }
 
         // Index hidden files
         if (Files.isHidden(path)) {
-            logger.info { "Indexing hidden directory: $path" }
+            logger.debug { "Indexing hidden directory: $path" }
             noVisit.add(name)
             return@onVisitFile FileVisitResult.CONTINUE
         }
 
         // Add the file to the list of files to search
-        logger.info { "Adding $path to index" }
+        logger.debug { "Adding $path to index" }
         index[name] = path
 
         FileVisitResult.CONTINUE
@@ -78,7 +78,7 @@ fun visitor(index: MutableMap<String, Path>, noVisit: MutableSet<String>) = file
         noVisit.add(path.fileName?.toString().orEmpty())
 
         // Skip files that cannot be visited
-        logger.error { "File $path could not be visited" }
+        logger.debug { "File $path could not be visited" }
 
         FileVisitResult.CONTINUE
     }
