@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/13DGT.iml" filepath="$PROJECT_DIR$/.idea/13DGT.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DataLens.main.iml" filepath="$PROJECT_DIR$/.idea/modules/DataLens.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DataLens.test.iml" filepath="$PROJECT_DIR$/.idea/modules/DataLens.test.iml" />
     </modules>
   </component>
 </project>
