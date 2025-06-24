@@ -9,9 +9,7 @@ import info.debatty.java.stringsimilarity.interfaces.StringDistance
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import me.apollointhehouse.data.db.dbConection
-import me.apollointhehouse.data.db.repository.FileIndexRepo
-import me.apollointhehouse.data.db.repository.impl.FileIndexRepoDB
+import me.apollointhehouse.data.db.repository.IndexRepo
 import me.apollointhehouse.data.io.visitor
 import me.apollointhehouse.data.locator.LocatorError
 import me.apollointhehouse.data.locator.LocatorError.IndexingFailed
@@ -23,7 +21,7 @@ import kotlin.io.path.visitFileTree
 class NameLocator(
     private val basePaths: List<Path>,
     private val algo: StringDistance = Jaccard(),
-    private val repo: FileIndexRepo = FileIndexRepoDB(dbConection)
+    private val repo: IndexRepo
 ) : QueryLocator<String, Result<Set<Path>, LocatorError>> {
     private var _state = MutableStateFlow<LocatorState>(LocatorState.Idle) // Initial state of the locator
     override val state = _state.asStateFlow()

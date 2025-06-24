@@ -1,8 +1,12 @@
 package me.apollointhehouse.data.db.repository
 
+import me.apollointhehouse.data.db.repository.impl.ExposedIndexRepo
+import org.jetbrains.exposed.v1.jdbc.Database
 import java.nio.file.Path
 
-interface FileIndexRepo {
+fun IndexRepo(database: Database): IndexRepo = ExposedIndexRepo(database)
+
+interface IndexRepo {
 
     /**
      * Checks if the file index exists in the database.

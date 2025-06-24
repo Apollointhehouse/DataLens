@@ -6,10 +6,11 @@ import androidx.compose.ui.window.application
 import app.softwork.routingcompose.DesktopRouter
 import app.softwork.routingcompose.Router
 import compose.icons.FontAwesomeIcons
-import compose.icons.fontawesomeicons.Regular
-import compose.icons.fontawesomeicons.regular.Eye
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.Eye
 import io.github.oshai.kotlinlogging.KotlinLogging
 import me.apollointhehouse.data.db.initDatabase
+import me.apollointhehouse.data.db.repository.IndexRepo
 import me.apollointhehouse.data.locator.impl.NameLocator
 import me.apollointhehouse.ui.screen.HomeScreen
 import me.apollointhehouse.ui.screen.SettingsScreen
@@ -25,27 +26,32 @@ fun main() = application {
     })
 
     logger.info { "Initializing Database..." }
-    initDatabase()
+    val db = initDatabase()
 
     logger.info { "DataLens Initialised!" }
 
 
-    val basePaths = listOf(
+    val paths = listOf(
         Path.of("C:\\"),
 //        Path.of(System.getProperty("user.home")),
 //        Path.of("\\\\internal.rotorualakes.school.nz\\Users\\Home\\")
     )
 
-    println("Base paths: $basePaths")
+    println("Base paths: $paths")
 
     Window(
         title = "DataLens",
-        icon = rememberVectorPainter(FontAwesomeIcons.Regular.Eye),
+        icon = rememberVectorPainter(FontAwesomeIcons.Solid.Eye),
         onCloseRequest = ::exitApplication
     ) {
         DesktopRouter("/") {
             route("/") {
-                HomeScreen(NameLocator(basePaths))
+                HomeScreen(
+                    locator = NameLocator(
+                        basePaths = paths,
+                        repo = IndexRepo(db)
+                    )
+                )
             }
 
             route("/settings") {

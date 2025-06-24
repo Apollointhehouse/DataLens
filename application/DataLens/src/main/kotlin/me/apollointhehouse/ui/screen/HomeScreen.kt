@@ -9,7 +9,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.softwork.routingcompose.Router
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.map
@@ -23,6 +22,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withContext
+import me.apollointhehouse.data.SearchResult
 import me.apollointhehouse.data.SearchResults
 import me.apollointhehouse.data.locator.LocatorError
 import me.apollointhehouse.data.locator.LocatorState
@@ -39,8 +39,8 @@ fun HomeScreen(
     locator: QueryLocator<String, Result<Set<Path>, LocatorError>>,
 ) {
     val searchText = rememberTextFieldState()
-    var locatorResults: Result<SearchResults, LocatorError> by remember { mutableStateOf(Err(LocatorError.NoResults)) }
-    val state = locator.state.collectAsState().value
+    var locatorResults: Result<SearchResults, LocatorError> by remember { mutableStateOf(Ok(SearchResults(emptySet()))) }
+    val state by locator.state.collectAsState()
 
     val router = Router.current
 
@@ -60,11 +60,16 @@ fun HomeScreen(
                     // Measure the time taken for the search operation and log it (visibility of system status)
                     val elapsed = measureTime {
                         locatorResults = locator
-                            .locate(query)
-                            .map { value -> SearchResults(value) }
+                            .locate(query = query)
+                            .map { paths ->
+                                SearchResults(results =
+                                    paths.map { path -> SearchResult(path) }.toSet()
+                                )
+                            }
                     }
-//                    logger.info { "Results: $searchResults" }
+
                     logger.info { "Elapsed: $elapsed" }
+                    logger.debug { "Results: $locatorResults" }
                 }
             }
     }
@@ -85,7 +90,7 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Input field for search
-                TextField(
+                OutlinedTextField(
                     state = searchText,
                     placeholder = { Text(text = "Search...") },
                 )
@@ -112,7 +117,9 @@ fun HomeScreen(
                         )
                     }
                 }
+
                 Spacer(modifier = Modifier.padding(16.dp))
+
                 // Display search results
                 Results(locatorResults)
             }
