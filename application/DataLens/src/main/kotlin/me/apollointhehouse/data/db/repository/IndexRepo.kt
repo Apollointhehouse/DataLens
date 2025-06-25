@@ -28,4 +28,16 @@ interface IndexRepo {
      * @param index a [Map] where the key is the file identifier and the value is the file path as a [Path].
      */
     fun createIndex(index: Map<String, Path>)
+
+    /**
+     * Removes the file index from the database.
+     */
+    fun removeIndex()
+
+    /**
+     * Determines whether the file index should be rebuilt.
+     *
+     * @return `true` if reindexing is required, `false` otherwise.
+     */
+    fun shouldReindex(): Boolean
 }

@@ -15,6 +15,7 @@ import me.apollointhehouse.data.locator.LocatorError
 import me.apollointhehouse.data.locator.LocatorError.IndexingFailed
 import me.apollointhehouse.data.locator.LocatorState
 import me.apollointhehouse.data.locator.QueryLocator
+import me.apollointhehouse.ui.Match
 import java.nio.file.Path
 import kotlin.io.path.visitFileTree
 
@@ -36,13 +37,21 @@ class NameLocator(
             indexFiles().bind() // Index files if the index is empty
         }
 
+        if (repo.shouldReindex()) {
+            _state.value = LocatorState.Indexing // Set state to indexing when reindexing files
+
+            logger.debug { "FileIndex needs to be rebuilt, reindexing files..." }
+            repo.removeIndex()
+            indexFiles().bind() // Reindex files if the index needs to be rebuilt
+        }
+
         _state.value = LocatorState.Locating // Set state to locating when performing a search
 
         logger.debug { "Searching for query: $query" }
         val results = repo.selectAll()
             .asSequence()
             .map { (name, path) -> path to algo.distance(name.lowercase(), query.lowercase()) } // Calculate distance to query for each file name
-            .filter { (_, dist) -> dist < MAX_DIST } // Filter out files that are not similar enough to the query
+            .filter { (_, dist) -> dist < match.dist } // Filter out files that are not similar enough to the query
             .sortedWith(Comparator.comparingDouble { (_, dist) -> dist }) // Sort by distance to query
             .map { (path, _) -> Path.of(path) } // Extract the paths
             .toSet()
@@ -73,7 +82,7 @@ class NameLocator(
          * Maximum distance for a match to be considered relevant.
          * This value is based on the StringDistance algorithm used.
          */
-        private const val MAX_DIST = 0.92
+        var match = Match.VERY_RELEVANT
 
         /**
          * The maximum depth to search.
