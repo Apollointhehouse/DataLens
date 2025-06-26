@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import app.softwork.routingcompose.Router
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.getOrElse
 import com.github.michaelbull.result.map
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
@@ -27,6 +28,7 @@ import me.apollointhehouse.data.SearchResults
 import me.apollointhehouse.data.locator.LocatorError
 import me.apollointhehouse.data.locator.LocatorState
 import me.apollointhehouse.data.locator.QueryLocator
+import me.apollointhehouse.data.state.HomeState
 import me.apollointhehouse.ui.components.Results
 import java.nio.file.Path
 import kotlin.time.measureTime
@@ -36,11 +38,13 @@ private val logger = KotlinLogging.logger {}
 @OptIn(FlowPreview::class)
 @Composable
 fun HomeScreen(
+    state: HomeState,
+    onStateChange: (HomeState) -> Unit,
     locator: QueryLocator<String, Result<Set<Path>, LocatorError>>,
 ) {
-    val searchText = rememberTextFieldState()
-    var locatorResults: Result<SearchResults, LocatorError> by remember { mutableStateOf(Ok(SearchResults(emptySet()))) }
-    val state by locator.state.collectAsState()
+    val searchText = rememberTextFieldState(state.searchQuery)
+    var locatorResults: Result<SearchResults, LocatorError> by remember { mutableStateOf(Ok(state.results)) }
+    val locatorState by locator.state.collectAsState()
 
     val router = Router.current
 
@@ -68,6 +72,11 @@ fun HomeScreen(
                             }
                     }
 
+                    onStateChange(state.copy(
+                        searchQuery = query,
+                        results = locatorResults.getOrElse { SearchResults(emptySet()) }
+                    ))
+
                     logger.info { "Elapsed: $elapsed" }
                     logger.debug { "Results: $locatorResults" }
                 }
@@ -94,7 +103,7 @@ fun HomeScreen(
                     state = searchText,
                     placeholder = { Text(text = "Search...") },
                 )
-                when (state) {
+                when (locatorState) {
                     is LocatorState.Locating -> {
                         Text(
                             text = "Locating...",

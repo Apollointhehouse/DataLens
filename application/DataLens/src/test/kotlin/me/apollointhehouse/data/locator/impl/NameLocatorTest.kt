@@ -1,6 +1,8 @@
 package me.apollointhehouse.data.locator.impl
 
+import info.debatty.java.stringsimilarity.Jaccard
 import kotlinx.coroutines.runBlocking
+import me.apollointhehouse.data.Match
 import me.apollointhehouse.data.db.repository.IndexRepo
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Files
@@ -13,6 +15,8 @@ class FakeIndexRepo : IndexRepo {
     override fun exists() = index.isNotEmpty()
     override fun selectAll() = index.map { it.key to it.value.toString() }
     override fun createIndex(index: Map<String, Path>) { this.index = index }
+    override fun removeIndex() { index = emptyMap() }
+    override fun shouldReindex(): Boolean = true
 }
 
 class NameLocatorTest {
@@ -28,7 +32,9 @@ class NameLocatorTest {
 
         val locator = NameLocator(
             basePaths = listOf(tempDir),
-            repo = FakeIndexRepo()
+            repo = FakeIndexRepo(),
+            match = Match.VERY_RELEVANT,
+            algo = Jaccard()
         )
 
         // Act

@@ -3,7 +3,7 @@ package me.apollointhehouse.ui.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -11,11 +11,13 @@ import app.softwork.routingcompose.Router
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Home
-import me.apollointhehouse.data.locator.impl.NameLocator
-import me.apollointhehouse.ui.Match
+import me.apollointhehouse.data.Match
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    match: Match,
+    onMatchChange: (Match) -> Unit,
+) {
     val router = Router.current
 
     MaterialTheme {
@@ -28,12 +30,6 @@ fun SettingsScreen() {
         ) {
             Column {
                 Card {
-                    var match by remember { mutableStateOf(NameLocator.match) }
-
-                    LaunchedEffect(match) {
-                        NameLocator.match = match
-                    }
-
                     TabRow(
                         selectedTabIndex = match.ordinal,
                         modifier = Modifier.width(550.dp)
@@ -41,7 +37,7 @@ fun SettingsScreen() {
                         Match.entries.forEachIndexed { index, option ->
                             Tab(
                                 selected = match.ordinal == index,
-                                onClick = { match = option },
+                                onClick = { onMatchChange(option) },
                                 text = {
                                     val name = option.name
                                         .lowercase()
@@ -57,6 +53,7 @@ fun SettingsScreen() {
                         }
                     }
                 }
+
             }
 
             // Navigation bar at the bottom

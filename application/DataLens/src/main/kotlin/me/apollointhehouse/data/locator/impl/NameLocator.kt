@@ -4,25 +4,25 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.binding
 import com.github.michaelbull.result.mapError
 import com.github.michaelbull.result.runCatching
-import info.debatty.java.stringsimilarity.Jaccard
 import info.debatty.java.stringsimilarity.interfaces.StringDistance
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import me.apollointhehouse.data.Match
 import me.apollointhehouse.data.db.repository.IndexRepo
 import me.apollointhehouse.data.io.visitor
 import me.apollointhehouse.data.locator.LocatorError
 import me.apollointhehouse.data.locator.LocatorError.IndexingFailed
 import me.apollointhehouse.data.locator.LocatorState
 import me.apollointhehouse.data.locator.QueryLocator
-import me.apollointhehouse.ui.Match
 import java.nio.file.Path
 import kotlin.io.path.visitFileTree
 
 class NameLocator(
-    private val basePaths: List<Path>,
-    private val algo: StringDistance = Jaccard(),
-    private val repo: IndexRepo
+    private val basePaths: List<Path>, // List of base paths to search for files
+    private val algo: StringDistance, // Algorithm used for calculating the distance between file names and the query
+    private val repo: IndexRepo, // Repository for managing the file index
+    private val match: Match // Maximum distance for a match to be considered relevant.
 ) : QueryLocator<String, Result<Set<Path>, LocatorError>> {
     private var _state = MutableStateFlow<LocatorState>(LocatorState.Idle) // Initial state of the locator
     override val state = _state.asStateFlow()
@@ -77,12 +77,6 @@ class NameLocator(
 
     companion object {
         private val logger = KotlinLogging.logger {}
-
-        /**
-         * Maximum distance for a match to be considered relevant.
-         * This value is based on the StringDistance algorithm used.
-         */
-        var match = Match.VERY_RELEVANT
 
         /**
          * The maximum depth to search.
