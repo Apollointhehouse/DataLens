@@ -1,0 +1,1 @@
+copy /b "7zS.sfx" + "config.txt" + "launcher.7z" "DataLens.exe"

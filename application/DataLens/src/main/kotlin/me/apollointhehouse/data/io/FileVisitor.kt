@@ -15,11 +15,11 @@ fun visitor(index: MutableMap<String, Path>, noVisit: MutableSet<String>) = file
             return@onPreVisitDirectory FileVisitResult.CONTINUE
         }
 
-        if (name in index) {
+//        if (name in index) {
             // If the directory is already indexed, skip it
-            logger.debug { "Directory $name is already indexed, skipping." }
-            return@onPreVisitDirectory FileVisitResult.SKIP_SUBTREE
-        }
+//            logger.debug { "Directory $name is already indexed, skipping." }
+//            return@onPreVisitDirectory FileVisitResult.SKIP_SUBTREE
+//        }
 
         // Skip directories that cannot be visited
         if (name in noVisit) {
@@ -43,11 +43,11 @@ fun visitor(index: MutableMap<String, Path>, noVisit: MutableSet<String>) = file
             return@onVisitFile FileVisitResult.CONTINUE
         }
 
-        if (name in index) {
+//        if (name in index) {
             // If the file is already indexed, skip it
-            logger.debug { "File $name is already indexed, skipping." }
-            return@onVisitFile FileVisitResult.CONTINUE
-        }
+//            logger.debug { "File $name is already indexed, skipping." }
+//            return@onVisitFile FileVisitResult.CONTINUE
+//        }
 
         // Exclude Recycle Bin system files
         if (name.startsWith("\$I") || name.startsWith("\$R")) return@onVisitFile FileVisitResult.SKIP_SIBLINGS

@@ -16,7 +16,7 @@ class FakeIndexRepo : IndexRepo {
     override fun selectAll() = index.map { it.key to it.value.toString() }
     override fun createIndex(index: Map<String, Path>) { this.index = index }
     override fun removeIndex() { index = emptyMap() }
-    override fun shouldReindex(): Boolean = true
+    override fun index(): Boolean = true
 }
 
 class NameLocatorTest {

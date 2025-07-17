@@ -37,7 +37,7 @@ interface IndexRepo {
     /**
      * Determines whether the file index should be rebuilt.
      *
-     * @return `true` if reindexing is required, `false` otherwise.
+     * @return `true` if indexing is required, `false` otherwise.
      */
-    fun shouldReindex(): Boolean
+    fun index(): Boolean
 }

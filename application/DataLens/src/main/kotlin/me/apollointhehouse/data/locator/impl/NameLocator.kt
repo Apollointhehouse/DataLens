@@ -1,13 +1,13 @@
 package me.apollointhehouse.data.locator.impl
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.binding
-import com.github.michaelbull.result.mapError
-import com.github.michaelbull.result.runCatching
+import com.github.michaelbull.result.*
 import info.debatty.java.stringsimilarity.interfaces.StringDistance
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import me.apollointhehouse.data.Match
 import me.apollointhehouse.data.db.repository.IndexRepo
 import me.apollointhehouse.data.io.visitor
@@ -26,23 +26,25 @@ class NameLocator(
 ) : QueryLocator<String, Result<Set<Path>, LocatorError>> {
     private var _state = MutableStateFlow<LocatorState>(LocatorState.Idle) // Initial state of the locator
     override val state = _state.asStateFlow()
+    private val scope = CoroutineScope(Dispatchers.IO)
+
+    init {
+        scope.launch {
+            if (repo.index()) {
+                _state.value = LocatorState.Indexing // Set state to indexing when reindexing files
+
+                logger.debug { "FileIndex needs to be built, indexing files..." }
+                if (repo.exists()) repo.removeIndex()
+                indexFiles() // Reindex files if the index needs to be rebuilt
+            }
+
+            _state.value = LocatorState.Idle
+        }
+    }
 
     override suspend fun locate(query: String): Result<Set<Path>, LocatorError> = binding {
-        logger.debug { "Checking if FileIndex exists!" }
-
-        if (!repo.exists()) {
-            _state.value = LocatorState.Indexing // Set state to indexing when starting to index files
-
-            logger.debug { "FileIndex does not exist, indexing files..." }
-            indexFiles().bind() // Index files if the index is empty
-        }
-
-        if (repo.shouldReindex()) {
-            _state.value = LocatorState.Indexing // Set state to indexing when reindexing files
-
-            logger.debug { "FileIndex needs to be rebuilt, reindexing files..." }
-            repo.removeIndex()
-            indexFiles().bind() // Reindex files if the index needs to be rebuilt
+        if (_state.value == LocatorState.Indexing) {
+            return@binding setOf()
         }
 
         _state.value = LocatorState.Locating // Set state to locating when performing a search
@@ -73,6 +75,8 @@ class NameLocator(
 
         logger.debug { "Creating index!"}
         repo.createIndex(index)
+
+        logger.info { "Finished indexing!" }
     }
 
     companion object {

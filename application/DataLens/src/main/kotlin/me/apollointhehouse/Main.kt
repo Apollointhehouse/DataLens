@@ -14,6 +14,9 @@ import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Eye
 import info.debatty.java.stringsimilarity.Jaccard
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import me.apollointhehouse.data.Match
 import me.apollointhehouse.data.db.initDatabase
 import me.apollointhehouse.data.db.repository.IndexRepo
@@ -41,7 +44,7 @@ fun main() = application {
     val paths = listOf(
         Path.of("C:\\"),
 //        Path.of(System.getProperty("user.home")),
-//        Path.of("\\\\internal.rotorualakes.school.nz\\Users\\Home\\")
+        Path.of("\\\\internal.rotorualakes.school.nz\\Users\\Home\\")
     )
 
     logger.info { "Base paths: $paths" }

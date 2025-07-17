@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
+
 plugins {
     kotlin("jvm") version "2.1.20"
     id("org.jetbrains.compose") version "1.8.1"
@@ -86,6 +87,8 @@ tasks {
             .map { zipTree(it) }
         from(dependencies)
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+        archiveBaseName.set("app")
     }
 }
 
@@ -93,17 +96,28 @@ tasks.test {
     useJUnitPlatform()
 }
 
-//compose.desktop {
-//    application {
-//        mainClass = "MainKt"
-//        nativeDistributions {
-//            targetFormats(TargetFormat.Msi, TargetFormat.Exe)
-//            packageName = "DataLens"
-//            packageVersion = "1.0.0"
+//tasks.register("createDistributable") {
+//    dependsOn(tasks.jar)
+//
+//    doLast {
+//        val dir = layout.buildDirectory.dir("libs").get().asFile
+//
+//        val jarFile = dir.listFiles()?.firstOrNull() ?: error("Failed to get jar")
+//        val jreFile = file(dir.path + "/jre").also {
+//            if (!it.exists()) error("jre must be provided in libs/jre folder")
 //        }
 //
-//        buildTypes.release.proguard {
-//            isEnabled.set(false)
+//        val out = file(dir.path + "/DataLens").also {
+//            if (!it.exists()) it.mkdirs()
+//        }
+//
+//        jarFile.copyTo(out)
+//        jreFile.copyTo(out)
+//
+//
+//        file(out.path + "/run.bat").also {
+//            it.createNewFile()
+//            it.writeText("${jreFile.path}/bin/java.exe -jar ${out.path}/DataLens-1.0.jar")
 //        }
 //    }
 //}
