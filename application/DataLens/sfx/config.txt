@@ -1,6 +1,5 @@
 ;!@Install@!UTF-8!
 Title="DataLens v1.0"
 BeginPrompt="Do you want to install DataLens v1.0?"
-InstallPath="C:\\Users\\21076cameron\\DataLens"
 RunProgram="launcher\setup.bat"
 ;!@InstallEnd@!
