@@ -42,9 +42,8 @@ fun main() = application {
 
 
     val paths = listOf(
-        Path.of("C:\\"),
-//        Path.of(System.getProperty("user.home")),
-        Path.of("\\\\internal.rotorualakes.school.nz\\Users\\Home\\")
+        Path.of(System.getenv("USERPROFILE")),
+        Path.of(System.getProperty("user.home")),
     )
 
     logger.info { "Base paths: $paths" }
