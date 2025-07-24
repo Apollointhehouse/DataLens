@@ -14,9 +14,6 @@ import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Eye
 import info.debatty.java.stringsimilarity.Jaccard
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import me.apollointhehouse.data.Match
 import me.apollointhehouse.data.db.initDatabase
 import me.apollointhehouse.data.db.repository.IndexRepo
@@ -25,8 +22,13 @@ import me.apollointhehouse.data.state.HomeState
 import me.apollointhehouse.ui.screen.HomeScreen
 import me.apollointhehouse.ui.screen.SettingsScreen
 import java.nio.file.Path
+import javax.swing.filechooser.FileSystemView
+import kotlin.io.path.exists
+
 
 private val logger = KotlinLogging.logger {}
+private val usrDir = Path.of(System.getenv("USERPROFILE"))
+val applicationDir = Path.of("$usrDir/DataLens").toAbsolutePath()
 
 fun main() = application {
     logger.info { "Starting main application..." }
@@ -41,9 +43,11 @@ fun main() = application {
     logger.info { "DataLens Initialised!" }
 
 
+    val view = FileSystemView.getFileSystemView()
+
     val paths = listOf(
-        Path.of(System.getenv("USERPROFILE")),
-        Path.of(System.getProperty("user.home")),
+        usrDir,
+        view.homeDirectory.toPath()
     )
 
     logger.info { "Base paths: $paths" }
@@ -64,7 +68,7 @@ fun main() = application {
                         homeState = newState
                     },
                     locator = NameLocator(
-                        basePaths = paths,
+                        basePaths = paths.filter { it.exists() },
                         repo = IndexRepo(db),
                         algo = Jaccard(),
                         match = match

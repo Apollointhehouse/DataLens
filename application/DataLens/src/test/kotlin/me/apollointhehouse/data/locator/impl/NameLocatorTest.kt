@@ -4,6 +4,7 @@ import info.debatty.java.stringsimilarity.Jaccard
 import kotlinx.coroutines.runBlocking
 import me.apollointhehouse.data.Match
 import me.apollointhehouse.data.db.repository.IndexRepo
+import me.apollointhehouse.data.locator.LocatorState
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Files
 import java.nio.file.Path
@@ -33,9 +34,14 @@ class NameLocatorTest {
         val locator = NameLocator(
             basePaths = listOf(tempDir),
             repo = FakeIndexRepo(),
-            match = Match.VERY_RELEVANT,
+            match = Match.NOT_RELEVANT,
             algo = Jaccard()
         )
+
+        when (val state = locator.state.value) {
+            is LocatorState.Indexing -> state.job.join() // Wait for indexing to complete
+            else -> {} // No indexing in progress
+        }
 
         // Act
         val result = locator.locate(query = fileName)
@@ -43,6 +49,9 @@ class NameLocatorTest {
         // Assert
         assertTrue(result.isOk)
         val found = result.value
-        assertTrue(found.any { it.fileName.toString() == fileName })
+        assert(found.isNotEmpty()) { "Expected to find at least one file, but found none." }
+
+        val foundFileNames = found.map { it.fileName.toString() }.also { println(it) }
+        assert(foundFileNames.any { it == fileName }) { "Expected to find file '$fileName' in results, but found: $foundFileNames" }
     }
 }

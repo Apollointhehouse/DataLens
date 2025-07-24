@@ -1,6 +1,9 @@
 package me.apollointhehouse.data.locator.impl
 
-import com.github.michaelbull.result.*
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.binding
+import com.github.michaelbull.result.mapError
+import com.github.michaelbull.result.runCatching
 import info.debatty.java.stringsimilarity.interfaces.StringDistance
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
@@ -29,9 +32,8 @@ class NameLocator(
     private val scope = CoroutineScope(Dispatchers.IO)
 
     init {
-        scope.launch {
+        val job = scope.launch {
             if (repo.index()) {
-                _state.value = LocatorState.Indexing // Set state to indexing when reindexing files
 
                 logger.debug { "FileIndex needs to be built, indexing files..." }
                 if (repo.exists()) repo.removeIndex()
@@ -40,10 +42,12 @@ class NameLocator(
 
             _state.value = LocatorState.Idle
         }
+
+        _state.value = LocatorState.Indexing(job) // Set state to indexing when reindexing files
     }
 
     override suspend fun locate(query: String): Result<Set<Path>, LocatorError> = binding {
-        if (_state.value == LocatorState.Indexing) {
+        if (_state.value is LocatorState.Indexing) {
             return@binding setOf()
         }
 
