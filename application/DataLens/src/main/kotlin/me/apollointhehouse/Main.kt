@@ -52,7 +52,7 @@ fun main() = application {
 
     logger.info { "Base paths: $paths" }
 
-    var match by remember { mutableStateOf(Match.VERY_RELEVANT) }
+    var match by remember { mutableStateOf(Match.RELEVANT) }
     var homeState = HomeState()
 
     Window(
