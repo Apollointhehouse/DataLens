@@ -28,7 +28,7 @@ import kotlin.io.path.exists
 
 private val logger = KotlinLogging.logger {}
 private val usrDir = Path.of(System.getenv("USERPROFILE"))
-val applicationDir = Path.of("$usrDir/DataLens").toAbsolutePath()
+val applicationDir: Path = Path.of("$usrDir/DataLens").toAbsolutePath()
 
 fun main() = application {
     logger.info { "Starting main application..." }
@@ -52,7 +52,7 @@ fun main() = application {
 
     logger.info { "Base paths: $paths" }
 
-    var match by remember { mutableStateOf(Match.RELEVANT) }
+    var match by remember { mutableStateOf(Match.SOMEWHAT_RELEVANT) }
     var homeState = HomeState()
 
     Window(
