@@ -36,14 +36,11 @@ class ExposedIndexRepo(private val database: Database) : IndexRepo {
     }
 
     override fun index(): Boolean = transaction(database) {
-        // Check if the index table exists and is not empty
-//        val creationDate = FileIndex.selectAll().first()[FileIndex.creationDate]
-//
-//        val daysSince = creationDate.daysUntil(LocalDate.now().toKotlinLocalDate())
-//
-//        daysSince > 3
-//        return !exists()
+//         Check if the index table exists and is not empty
+        val creationDate = FileIndex.selectAll().first()[FileIndex.creationDate]
 
-        true
+        val daysSince = creationDate.daysUntil(LocalDate.now().toKotlinLocalDate())
+
+        daysSince > 3 || !exists()
     }
 }
