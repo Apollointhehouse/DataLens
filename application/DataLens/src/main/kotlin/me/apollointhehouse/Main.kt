@@ -40,9 +40,6 @@ fun main() = application {
     logger.info { "Initializing Database..." }
     val db = initDatabase()
 
-    logger.info { "DataLens Initialised!" }
-
-
     val view = FileSystemView.getFileSystemView()
 
     val paths = listOf(
@@ -54,6 +51,8 @@ fun main() = application {
 
     var match by remember { mutableStateOf(Match.SOMEWHAT_RELEVANT) }
     var homeState = HomeState()
+
+    logger.info { "DataLens Initialised!" }
 
     Window(
         title = "DataLens",
@@ -67,6 +66,7 @@ fun main() = application {
                     onStateChange = { newState ->
                         homeState = newState
                     },
+                    // Uses dependency injection and strategy pattern
                     locator = NameLocator(
                         basePaths = paths.filter { it.exists() },
                         repo = IndexRepo(db),

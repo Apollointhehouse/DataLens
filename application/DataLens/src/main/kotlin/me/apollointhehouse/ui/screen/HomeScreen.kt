@@ -18,6 +18,7 @@ import com.github.michaelbull.result.map
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Cog
+import compose.icons.fontawesomeicons.solid.Home
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,7 +29,10 @@ import me.apollointhehouse.data.locator.LocatorError
 import me.apollointhehouse.data.locator.LocatorState
 import me.apollointhehouse.data.locator.QueryLocator
 import me.apollointhehouse.data.state.HomeState
+import me.apollointhehouse.ui.components.DatalensPage
+import me.apollointhehouse.ui.components.Page
 import me.apollointhehouse.ui.components.Results
+import me.apollointhehouse.ui.components.navbar
 import me.apollointhehouse.ui.utils.awtKeyEvent
 import java.nio.file.Path
 import kotlin.time.measureTime
@@ -40,100 +44,74 @@ fun HomeScreen(
     state: HomeState,
     onStateChange: (HomeState) -> Unit,
     locator: QueryLocator<String, Result<Set<Path>, LocatorError>>,
+) = DatalensPage(
+    Page("Settings", "/settings", FontAwesomeIcons.Solid.Cog)
 ) {
     val searchText = rememberTextFieldState(state.searchQuery)
     var locatorResults: Result<SearchResults, LocatorError> by remember { mutableStateOf(Ok(state.results)) }
     val locatorState by locator.state.collectAsState()
 
-    val router = Router.current
     val scope = rememberCoroutineScope()
 
-    // Observe changes in the search text and perform search
-//    locatorResults = search(searchText, locatorResults, locator, onStateChange, state)
-
-    MaterialTheme {
-        Box(
-            contentAlignment = Alignment.Center,
+    // Center the content in the Box and list the components vertically
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(38.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Spacer(modifier = Modifier.height(256.dp))
+        // Input field for search
+        OutlinedTextField(
+            state = searchText,
+            placeholder = { Text(text = "Search...") },
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .background(MaterialTheme.colors.background)
-        ) {
-            // Center the content in the Box and list the components vertically
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Input field for search
-                OutlinedTextField(
-                    state = searchText,
-                    placeholder = { Text(text = "Search...") },
-                    modifier = Modifier
-                        .onKeyEvent { keyEvent ->
-                            val nativeEvent = keyEvent.nativeKeyEvent
-                            val code = nativeEvent.awtKeyEvent.keyChar.code
-                            val enterKey = 10
-
-                            if (code != enterKey) return@onKeyEvent false
-
-                            logger.debug { "enter pressed, performing search" }
-
-                            scope.launch {
-                                // Observe changes in the search text and perform search
-                                locatorResults = search(searchText, locator, onStateChange, state)
-                            }
-
-                            true
-                        }
-                )
-                when (locatorState) {
-                    is LocatorState.Locating -> {
-                        Text(
-                            text = "Locating...",
-                            modifier = Modifier.padding(top = 8.dp),
-                            style = MaterialTheme.typography.body2
-                        )
+                .onKeyEvent { keyEvent ->
+                    val nativeEvent = keyEvent.nativeKeyEvent
+                    val code = nativeEvent.awtKeyEvent.keyChar.code
+                    val enterKey = 10
+                    if (code != enterKey) return@onKeyEvent false
+                    logger.debug { "enter pressed, performing search" }
+                    scope.launch {
+                        // Observe changes in the search text and perform search
+                        locatorResults = search(searchText, locator, onStateChange, state)
                     }
-                    is LocatorState.Indexing -> {
-                        Text(
-                            text = "Indexing file system...",
-                            modifier = Modifier.padding(top = 8.dp),
-                            style = MaterialTheme.typography.body2
-                        )
-                    }
-                    is LocatorState.Idle -> {
-                        Text(
-                            text = "Ready to search!",
-                            modifier = Modifier.padding(top = 8.dp),
-                            style = MaterialTheme.typography.body2
-                        )
-                    }
+                    true
                 }
+        )
+        displayState(locatorState)
+        Spacer(modifier = Modifier.padding(16.dp))
+        // Display search results
+        Results(locatorResults)
+    }
+}
 
-                Spacer(modifier = Modifier.padding(16.dp))
+// Display the current state of the locator (visibility of system status)
+@Composable
+private fun displayState(locatorState: LocatorState) = when (locatorState) {
+    is LocatorState.Locating -> {
+        Text(
+            text = "Locating Files...",
+            modifier = Modifier.padding(top = 8.dp),
+            style = MaterialTheme.typography.body2
+        )
+    }
 
-                // Display search results
-                Results(locatorResults)
-            }
+    is LocatorState.Indexing -> {
+        Text(
+            text = "Preparing for search...",
+            modifier = Modifier.padding(top = 8.dp),
+            style = MaterialTheme.typography.body2
+        )
+    }
 
-            // Navigation bar at the bottom
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomStart)
-                    .padding(16.dp),
-            ) {
-                Button(onClick = { router.navigate("/settings") }) {
-                    Icon(
-                        imageVector = FontAwesomeIcons.Solid.Cog,
-                        contentDescription = "Settings",
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
-        }
+    is LocatorState.Idle -> {
+        Text(
+            text = "Ready to search!",
+            modifier = Modifier.padding(top = 8.dp),
+            style = MaterialTheme.typography.body2
+        )
     }
 }
 
@@ -164,11 +142,10 @@ private suspend fun search(
                 }
         }
 
-        onStateChange(
-            state.copy(
-                searchQuery = query,
-                results = results.getOrElse { SearchResults(emptySet()) }
-            ))
+        onStateChange(state.copy(
+            searchQuery = query,
+            results = results.getOrElse { SearchResults(emptySet()) }
+        ))
 
         logger.info { "Elapsed: $elapsed" }
         logger.debug { "Results: $results" }
