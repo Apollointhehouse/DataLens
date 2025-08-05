@@ -1,24 +1,21 @@
 package me.apollointhehouse.ui.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.unit.dp
-import app.softwork.routingcompose.Router
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.getOrElse
 import com.github.michaelbull.result.map
-import compose.icons.FontAwesomeIcons
-import compose.icons.fontawesomeicons.Solid
-import compose.icons.fontawesomeicons.solid.Cog
-import compose.icons.fontawesomeicons.solid.Home
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,9 +27,7 @@ import me.apollointhehouse.data.locator.LocatorState
 import me.apollointhehouse.data.locator.QueryLocator
 import me.apollointhehouse.data.state.HomeState
 import me.apollointhehouse.ui.components.DatalensPage
-import me.apollointhehouse.ui.components.Page
 import me.apollointhehouse.ui.components.Results
-import me.apollointhehouse.ui.components.navbar
 import me.apollointhehouse.ui.utils.awtKeyEvent
 import java.nio.file.Path
 import kotlin.time.measureTime
@@ -45,27 +40,19 @@ fun HomeScreen(
     onStateChange: (HomeState) -> Unit,
     locator: QueryLocator<String, Result<Set<Path>, LocatorError>>,
 ) = DatalensPage(
-    Page("Settings", "/settings", FontAwesomeIcons.Solid.Cog)
-) {
-    val searchText = rememberTextFieldState(state.searchQuery)
-    var locatorResults: Result<SearchResults, LocatorError> by remember { mutableStateOf(Ok(state.results)) }
-    val locatorState by locator.state.collectAsState()
+    name = "Home",
+    topBar = {
+        var searchQuery by remember { mutableStateOf(state.searchQuery) }
 
-    val scope = rememberCoroutineScope()
+        var fieldState = rememberTextFieldState(searchQuery)
+        var locatorResults: Result<SearchResults, LocatorError> by remember { mutableStateOf(Ok(state.results)) }
 
-    // Center the content in the Box and list the components vertically
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(38.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-        Spacer(modifier = Modifier.height(256.dp))
+        val scope = rememberCoroutineScope()
+
         // Input field for search
         OutlinedTextField(
-            state = searchText,
-            placeholder = { Text(text = "Search...") },
+            state = fieldState,
+            placeholder = { Text(text = "⌕ Search Files...") },
             modifier = Modifier
                 .onKeyEvent { keyEvent ->
                     val nativeEvent = keyEvent.nativeKeyEvent
@@ -74,18 +61,40 @@ fun HomeScreen(
                     if (code != enterKey) return@onKeyEvent false
                     logger.debug { "enter pressed, performing search" }
                     scope.launch {
+                        searchQuery = ""
+
                         // Observe changes in the search text and perform search
-                        locatorResults = search(searchText, locator, onStateChange, state)
+                        locatorResults = search(searchQuery, locator, onStateChange, state)
                     }
+
+//                    fieldState = TextFieldState("") // Clear the search text after search
+
+                    searchQuery = fieldState.text.toString()
                     true
                 }
+                .width(520.dp)
+                .height(60.dp)
+                .background(MaterialTheme.colors.background)
+                .border(2.dp, MaterialTheme.colors.primary, MaterialTheme.shapes.large)
         )
-        displayState(locatorState)
-        Spacer(modifier = Modifier.padding(16.dp))
-        // Display search results
-        Results(locatorResults)
+    },
+
+    content = {
+        val locatorState by locator.state.collectAsState()
+
+        // Center the content
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize(),
+        ) {
+            displayState(locatorState)
+            Spacer(modifier = Modifier.padding(16.dp))
+            // Display search results
+            Results(state.results)
+        }
     }
-}
+)
 
 // Display the current state of the locator (visibility of system status)
 @Composable
@@ -116,7 +125,7 @@ private fun displayState(locatorState: LocatorState) = when (locatorState) {
 }
 
 private suspend fun search(
-    searchText: TextFieldState,
+    searchText: String,
     locator: QueryLocator<String, Result<Set<Path>, LocatorError>>,
     onStateChange: (HomeState) -> Unit,
     state: HomeState
@@ -125,15 +134,14 @@ private suspend fun search(
 
     // Run the search operation in the IO dispatcher to avoid blocking the main thread
     withContext(Dispatchers.IO) {
-        val query = searchText.text.toString()
 
         results = Ok(SearchResults(emptySet())) // Clear previous results
-        logger.info { "Searching: $query" }
+        logger.info { "Searching: $searchText" }
 
         // Measure the time taken for the search operation and log it (visibility of system status)
         val elapsed = measureTime {
             results = locator
-                .locate(query = query)
+                .locate(query = searchText)
                 .map { paths ->
                     SearchResults(
                         results =
@@ -143,8 +151,8 @@ private suspend fun search(
         }
 
         onStateChange(state.copy(
-            searchQuery = query,
-            results = results.getOrElse { SearchResults(emptySet()) }
+            searchQuery = "",
+            results = results.getOrElse { SearchResults(emptySet()) },
         ))
 
         logger.info { "Elapsed: $elapsed" }

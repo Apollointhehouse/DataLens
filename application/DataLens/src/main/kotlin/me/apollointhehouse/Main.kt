@@ -50,7 +50,7 @@ fun main() = application {
     logger.info { "Base paths: $paths" }
 
     var match by remember { mutableStateOf(Match.SOMEWHAT_RELEVANT) }
-    var homeState = HomeState()
+    var homeState by remember { mutableStateOf(HomeState()) }
 
     logger.info { "DataLens Initialised!" }
 

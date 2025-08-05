@@ -1,26 +1,20 @@
 package me.apollointhehouse.ui.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import compose.icons.FontAwesomeIcons
-import compose.icons.fontawesomeicons.Solid
-import compose.icons.fontawesomeicons.solid.Home
 import me.apollointhehouse.data.Match
 import me.apollointhehouse.ui.components.DatalensPage
-import me.apollointhehouse.ui.components.Page
-import me.apollointhehouse.ui.components.navbar
 
 @Composable
 fun SettingsScreen(
     match: Match,
     onMatchChange: (Match) -> Unit,
 ) = DatalensPage(
-    Page("Home", "/", FontAwesomeIcons.Solid.Home)
+    name = "Settings"
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
