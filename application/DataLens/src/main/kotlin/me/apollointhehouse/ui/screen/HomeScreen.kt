@@ -3,7 +3,7 @@ package me.apollointhehouse.ui.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -42,12 +42,17 @@ fun HomeScreen(
 ) = DatalensPage(
     name = "Home",
     topBar = {
-        var searchQuery by remember { mutableStateOf(state.searchQuery) }
-
-        var fieldState = rememberTextFieldState(searchQuery)
-        var locatorResults: Result<SearchResults, LocatorError> by remember { mutableStateOf(Ok(state.results)) }
-
+        var fieldState by remember { mutableStateOf(TextFieldState(state.searchQuery)) }
         val scope = rememberCoroutineScope()
+
+        scope.launch {
+            search(
+                query = fieldState.text.toString().replace("\n", ""),
+                locator = locator,
+                onStateChange = onStateChange,
+                state = state
+            )
+        }
 
         // Input field for search
         OutlinedTextField(
@@ -60,16 +65,8 @@ fun HomeScreen(
                     val enterKey = 10
                     if (code != enterKey) return@onKeyEvent false
                     logger.debug { "enter pressed, performing search" }
-                    scope.launch {
-                        searchQuery = ""
 
-                        // Observe changes in the search text and perform search
-                        locatorResults = search(searchQuery, locator, onStateChange, state)
-                    }
-
-//                    fieldState = TextFieldState("") // Clear the search text after search
-
-                    searchQuery = fieldState.text.toString()
+                    fieldState = TextFieldState(fieldState.text.toString().replace("\n", ""))
                     true
                 }
                 .width(520.dp)
@@ -125,7 +122,7 @@ private fun displayState(locatorState: LocatorState) = when (locatorState) {
 }
 
 private suspend fun search(
-    searchText: String,
+    query: String,
     locator: QueryLocator<String, Result<Set<Path>, LocatorError>>,
     onStateChange: (HomeState) -> Unit,
     state: HomeState
@@ -136,12 +133,12 @@ private suspend fun search(
     withContext(Dispatchers.IO) {
 
         results = Ok(SearchResults(emptySet())) // Clear previous results
-        logger.info { "Searching: $searchText" }
+        logger.info { "Searching: $query" }
 
         // Measure the time taken for the search operation and log it (visibility of system status)
         val elapsed = measureTime {
             results = locator
-                .locate(query = searchText)
+                .locate(query = query)
                 .map { paths ->
                     SearchResults(
                         results =
@@ -151,7 +148,7 @@ private suspend fun search(
         }
 
         onStateChange(state.copy(
-            searchQuery = "",
+            searchQuery = query.replace("\n", ""),
             results = results.getOrElse { SearchResults(emptySet()) },
         ))
 

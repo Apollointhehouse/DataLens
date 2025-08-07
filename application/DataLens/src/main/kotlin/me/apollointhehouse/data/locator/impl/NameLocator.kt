@@ -33,13 +33,16 @@ class NameLocator(
 
     init {
         val job = scope.launch {
+            logger.info { "Checking if index needs to be built..." }
+
             if (repo.index()) {
 
                 logger.debug { "FileIndex needs to be built, indexing files..." }
                 if (repo.exists()) repo.removeIndex()
                 indexFiles() // Reindex files if the index needs to be rebuilt
-            }
+            } else logger.info { "indexing not required" }
 
+            logger.info { "setting idle" }
             _state.value = LocatorState.Idle
         }
 

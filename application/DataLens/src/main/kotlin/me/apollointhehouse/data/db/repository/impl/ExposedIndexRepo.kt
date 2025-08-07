@@ -1,5 +1,6 @@
 package me.apollointhehouse.data.db.repository.impl
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.toKotlinLocalDate
 import me.apollointhehouse.data.db.model.FileIndex
@@ -13,6 +14,8 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.nio.file.Path
 import java.time.LocalDate
 
+private val logger = KotlinLogging.logger {}
+
 class ExposedIndexRepo(private val database: Database) : IndexRepo {
     override fun exists(): Boolean = transaction(database) { FileIndex.exists() }
 
@@ -21,6 +24,8 @@ class ExposedIndexRepo(private val database: Database) : IndexRepo {
     }
 
     override fun createIndex(index: Map<String, Path>) = transaction(database) {
+        logger.info { "Creating file index with ${index.size} entries." }
+
         SchemaUtils.create(FileIndex)
         index.forEach { (name, path) ->
             FileIndex.insertIgnore {
@@ -36,11 +41,19 @@ class ExposedIndexRepo(private val database: Database) : IndexRepo {
     }
 
     override fun index(): Boolean = transaction(database) {
+        if (!exists()) {
+            logger.info { "Does not exist" }
+            return@transaction true
+        } else {
+            logger.info { "Exists" }
+        }
+
 //         Check if the index table exists and is not empty
         val creationDate = FileIndex.selectAll().first()[FileIndex.creationDate]
 
         val daysSince = creationDate.daysUntil(LocalDate.now().toKotlinLocalDate())
 
+//        false
         daysSince > 3 || !exists()
     }
 }

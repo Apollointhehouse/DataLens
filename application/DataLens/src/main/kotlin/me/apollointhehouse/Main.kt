@@ -57,7 +57,8 @@ fun main() = application {
     Window(
         title = "DataLens",
         icon = rememberVectorPainter(FontAwesomeIcons.Solid.Eye),
-        onCloseRequest = ::exitApplication
+        onCloseRequest = ::exitApplication,
+        resizable = false
     ) {
         DesktopRouter("/") {
             route("/") {
