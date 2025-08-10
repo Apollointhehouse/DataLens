@@ -47,11 +47,11 @@ class NameLocatorTest {
         val result = locator.locate(query = fileName)
 
         // Assert
-        assertTrue(result.isOk)
+        assertTrue(result.isOk, message = "Expected locate to succeed, but it failed with: ${result.value}")
         val found = result.value
-        assert(found.isNotEmpty()) { "Expected to find at least one file, but found none." }
+        assertTrue(found.isNotEmpty(), message = "Expected to find at least one file, but found none.")
 
         val foundFileNames = found.map { it.fileName.toString() }.also { println(it) }
-        assert(foundFileNames.any { it == fileName }) { "Expected to find file '$fileName' in results, but found: $foundFileNames" }
+        assertTrue(foundFileNames.any { it == fileName }, message = "Expected to find file '$fileName' in results, but found: $foundFileNames")
     }
 }
