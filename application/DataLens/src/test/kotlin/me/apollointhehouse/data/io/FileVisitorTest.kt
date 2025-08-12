@@ -11,6 +11,11 @@ class FileVisitorTest {
     @TempDir
     lateinit var tempDir: Path
 
+    /**
+     * This test checks that the file visitor correctly indexes files and skips hidden and unvisitable files.
+     * It creates a visible file, a hidden file, and a directory, then walks the file tree to index them.
+     * The test ensures that only the visible file is indexed and the hidden file is skipped.
+     */
     @Test
     fun `visitor indexes files and skips hidden and unvisitable files`() {
         val visibleFile = Files.createFile(tempDir.resolve("visible.txt"))

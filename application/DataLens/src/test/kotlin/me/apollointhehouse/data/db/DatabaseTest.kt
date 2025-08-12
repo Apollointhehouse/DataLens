@@ -15,6 +15,10 @@ class DatabaseTest {
     @TempDir
     lateinit var tempDir: Path
 
+    /**
+     * This test checks if the database connection can be established and if the FileIndex table
+     * is created successfully. It uses a temporary directory for the database file.
+     */
     @Test
     fun `database connection should be established`() {
         // Check if the database file exists
