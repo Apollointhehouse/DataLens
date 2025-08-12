@@ -24,6 +24,11 @@ class NameLocatorTest {
     @TempDir
     lateinit var tempDir: Path
 
+    /**
+     * This test checks that the locator can find a file by its name.
+     * It creates a temporary file, indexes it, and then searches for it.
+     * The test ensures that the file is found and that the results are as expected.
+     */
     @Test
     fun `locate should find file by name`() = runBlocking {
         // Arrange
@@ -53,5 +58,61 @@ class NameLocatorTest {
 
         val foundFileNames = found.map { it.fileName.toString() }.also { println(it) }
         assertTrue(foundFileNames.any { it == fileName }, message = "Expected to find file '$fileName' in results, but found: $foundFileNames")
+    }
+
+    /**
+     * This test checks that the locator can handle a case where the file does not exist.
+     * It should return an empty set without throwing an error.
+     * This is a boundary case to ensure robustness of the locator.
+     */
+    @Test
+    fun `locate should return empty set for non-existing file`() = runBlocking {
+        // Arrange
+        val locator = NameLocator(
+            basePaths = listOf(tempDir),
+            repo = FakeIndexRepo(),
+            match = Match.NOT_RELEVANT,
+            algo = Jaccard()
+        )
+
+        when (val state = locator.state.value) {
+            is LocatorState.Indexing -> state.job.join() // Wait for indexing to complete
+            else -> {} // No indexing in progress
+        }
+
+        // Act
+        val result = locator.locate(query = "nonexistentfile.txt")
+
+        // Assert
+        assertTrue(result.isOk, message = "Expected locate to succeed, but it failed with: ${result.value}")
+        assertTrue(result.value.isEmpty(), message = "Expected to find no files, but found: ${result.value}")
+    }
+
+    /**
+     * This test checks that the locator can handle an empty query gracefully.
+     * It should return an empty set without throwing an error.
+     * This is a boundary case to ensure robustness of the locator.
+     */
+    @Test
+    fun `locate should handle empty query gracefully`() = runBlocking {
+        // Arrange
+        val locator = NameLocator(
+            basePaths = listOf(tempDir),
+            repo = FakeIndexRepo(),
+            match = Match.NOT_RELEVANT,
+            algo = Jaccard()
+        )
+
+        when (val state = locator.state.value) {
+            is LocatorState.Indexing -> state.job.join() // Wait for indexing to complete
+            else -> {} // No indexing in progress
+        }
+
+        // Act
+        val result = locator.locate(query = "")
+
+        // Assert
+        assertTrue(result.isOk, message = "Expected locate to succeed, but it failed with: ${result.value}")
+        assertTrue(result.value.isEmpty(), message = "Expected to find no files for empty query, but found: ${result.value}")
     }
 }
