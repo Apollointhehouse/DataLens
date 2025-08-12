@@ -1,4 +1,4 @@
-package me.apollointhehouse.data.locator.impl
+package me.apollointhehouse.data.db
 
 import me.apollointhehouse.data.db.model.FileIndex
 import org.jetbrains.exposed.v1.jdbc.Database
