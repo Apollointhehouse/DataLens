@@ -25,7 +25,6 @@ import java.nio.file.Path
 import javax.swing.filechooser.FileSystemView
 import kotlin.io.path.exists
 
-
 private val logger = KotlinLogging.logger {}
 private val usrDir = Path.of(System.getenv("USERPROFILE"))
 val applicationDir: Path = Path.of("$usrDir/DataLens").toAbsolutePath()
@@ -33,15 +32,18 @@ val applicationDir: Path = Path.of("$usrDir/DataLens").toAbsolutePath()
 fun main() = application {
     logger.info { "Starting main application..." }
 
+    // Add a shutdown hook to handle application shutdown
     Runtime.getRuntime().addShutdownHook(Thread {
         logger.info { "Shutting Down!" }
     })
 
+    // Initialize the database
     logger.info { "Initializing Database..." }
     val db = initDatabase()
 
     val view = FileSystemView.getFileSystemView()
 
+    // Define base search paths
     val paths = listOf(
         usrDir,
         view.homeDirectory.toPath()
@@ -54,12 +56,14 @@ fun main() = application {
 
     logger.info { "DataLens Initialised!" }
 
+    // Create the main application window
     Window(
         title = "DataLens",
         icon = rememberVectorPainter(FontAwesomeIcons.Solid.Eye),
         onCloseRequest = ::exitApplication,
         resizable = false
     ) {
+        // Set up the desktop router for navigation
         DesktopRouter("/") {
             route("/") {
                 HomeScreen(
