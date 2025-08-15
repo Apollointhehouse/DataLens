@@ -14,7 +14,9 @@ DataLens is a Kotlin desktop application for Windows that empowers users to sear
 - 👥 Suitable for casual and power users
 
 ## 🏗️ Project Structure
-- `application/DataLens` - Kotlin project source code
+- `application/DataLens` - Kotlin project
+- `application/DataLens/src/main` - Kotlin project source code
+- `application/DataLens/src/test` - Kotlin project unit tests
 - `application/testing` - Testing screenshots
 - `application/improvements` - Improvements made during development
 - `application/feedback.md` - User/stakeholder feedback, suggestions, and changes made
