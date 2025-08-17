@@ -1,4 +1,4 @@
-# 📊 DataLens
+# DataLens
 
 ## 🚀 Overview
 DataLens is a Kotlin desktop application for Windows that empowers users to search, index, and manage files efficiently. Featuring a modern UI built with Compose for Desktop, customizable search relevance, and a local database for fast file indexing, DataLens is designed for privacy, speed, and ease of use.
